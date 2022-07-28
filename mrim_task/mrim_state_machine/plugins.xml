@@ -1,0 +1,5 @@
+<library path="lib/libMrimStateMachine">
+  <class name="mrim_state_machine/MrimStateMachine" type="mrim_state_machine::MrimStateMachine" base_class_type="nodelet::Nodelet">
+    <description>MtspStateMachine nodelet</description>
+  </class>
+</library>

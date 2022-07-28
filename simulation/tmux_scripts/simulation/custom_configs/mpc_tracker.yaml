@@ -1,0 +1,5 @@
+# mrs collision avoidance
+collision_avoidance:
+  enabled: false
+
+mpc_rate: 10.0 # rate of MPC calculation, >= 10 Hz

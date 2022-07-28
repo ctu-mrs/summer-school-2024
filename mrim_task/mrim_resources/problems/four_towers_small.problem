@@ -1,0 +1,27 @@
+NAME: Small four towers (two robots)
+COMMENT: Small four towers problem for MRS UAV Summer School 2022
+
+# ID X Y Z HEADING
+ROBOTS_START
+1 -5.0 -10.0 0.75 1.57
+2 15.0 -10.0 0.75 1.57
+ROBOTS_END
+
+# ID X Y Z HEADING INSPECTABILITY
+INSPECTION_POINTS_START
+1 6.92 -1.53 3.85 -1.3 1 2
+2 12.3 2.01 3.85 0.2 1
+3 12.1 7.4 3.85 1.57 1 2
+4 0 0 5.56 -1.57 1 2
+5 3.03 -0.2 5.56 -1.57 1 2
+6 6.1 -0.52 5.56 2.2 1 2
+7 11.3 2.4 5.56 0.2 2
+8 11.2 5.05 5.56 2.7 1 2
+9 2.9 0.8 3.83 1.57 1 2
+10 10.1 7.3 3.83 1.57 1 2
+INSPECTION_POINTS_END
+
+OBSTACLE_POINTS: four_towers.asc
+WORLD: four_towers.yaml
+
+EOF

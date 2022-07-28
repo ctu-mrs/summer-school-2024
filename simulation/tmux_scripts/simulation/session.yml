@@ -1,0 +1,73 @@
+name: simulation
+root: ./
+startup_window: planner
+pre_window: export PROBLEM=single_tower; export UAV_NAME=uav1; export RUN_TYPE=simulation; export UAV_TYPE=f450; export WORLD_FILE=${HOME}/summer-school-2022/mrim_task/mrim_resources/worlds/${PROBLEM}.yaml; export SENSORS="garmin_down"
+windows:
+  - roscore:
+      layout: tiled
+      panes:
+        - roscore
+  - gazebo:
+      layout: tiled
+      panes:
+        - waitForRos; roslaunch mrs_simulation simulation.launch world_name:=grass_plane world_file:='$(find mrim_resources)/gazebo_files/worlds/$(env PROBLEM).world' gui:=true
+  - status:
+      layout: tiled
+      panes:
+        - export UAV_NAME=uav1; waitForSimulation; roslaunch mrs_uav_status status.launch
+        - export UAV_NAME=uav2; waitForSimulation; roslaunch mrs_uav_status status.launch
+  - spawn:
+      layout: tiled
+      panes:
+        - waitForSimulation; rosservice call /mrs_drone_spawner/spawn "1 2 $UAV_TYPE --enable-rangefinder --enable-ground-truth --enable-realsense-front --pos_file `pwd`/pos_$PROBLEM.yaml"
+  - control:
+      layout: tiled
+      panes:
+        - export UAV_NAME=uav1; waitForOdometry; roslaunch mrs_uav_general core.launch config_constraint_manager:=./custom_configs/constraint_manager.yaml config_mpc_tracker:=./custom_configs/mpc_tracker.yaml config_uav_manager:=./custom_configs/uav_manager.yaml config_odometry:=./custom_configs/odometry.yaml
+        - export UAV_NAME=uav2; waitForOdometry; roslaunch mrs_uav_general core.launch config_constraint_manager:=./custom_configs/constraint_manager.yaml config_mpc_tracker:=./custom_configs/mpc_tracker.yaml config_uav_manager:=./custom_configs/uav_manager.yaml config_odometry:=./custom_configs/odometry.yaml
+  - automatic_start:
+      layout: tiled
+      panes:
+        - export UAV_NAME=uav1; waitForSimulation; roslaunch mrs_uav_general automatic_start.launch custom_config:=./custom_configs/automatic_start.yaml
+        - export UAV_NAME=uav2; waitForSimulation; roslaunch mrs_uav_general automatic_start.launch custom_config:=./custom_configs/automatic_start.yaml
+  - state_machine:
+      layout: even-vertical
+      panes:
+        - export UAV_NAME=uav1; waitForOdometry; roslaunch mrim_state_machine simulation.launch
+  - planner:
+      layout: even-vertical
+      panes:
+        - export UAV_NAME=uav1; waitForOdometry; roslaunch mrim_planner planner.launch RUN_TYPE:=simulation
+  - start_planning:
+      layout: even-vertical
+      synchronize: after
+      panes:
+        - 'export UAV_NAME=uav1;
+          history -s rosservice call /$UAV_NAME/mrim_state_machine/start'
+  - takeoff:
+      layout: tiled
+      synchronize: after
+      panes:
+        - 'export UAV_NAME1=uav1; export UAV_NAME2=uav2; ./takeoff_manager.py $UAV_NAME1 $UAV_NAME2'
+  - goto:
+      layout: tiled
+      synchronize: after
+      panes:
+        - 'export UAV_NAME=uav1;
+          history -s rosservice call /$UAV_NAME/control_manager/goto \"goal: \[10.0, 0.0, 3.0, 0.0\]\";
+          history -s rosservice call /$UAV_NAME/control_manager/goto \"goal: \[-10.0, 0.0, 3.0, 0.0\]\"'
+        - 'export UAV_NAME=uav2;
+          history -s rosservice call /$UAV_NAME/control_manager/goto \"goal: \[-10.0, 0.0, 3.0, 0.0\]\";
+          history -s rosservice call /$UAV_NAME/control_manager/goto \"goal: \[10.0, 0.0, 3.0, 0.0\]\"'
+  - gazebo_camera_follow:
+      layout: tiled
+      panes:
+        - waitForOdometry; gz camera -c gzclient_camera -f uav1; history -s gz camera -c gzclient_camera -f uav1
+  - tf_connector:
+      layout: even-vertical
+      panes:
+        - export UAV_NAME=uav1; waitForOdometry; roslaunch mrim_state_machine tf_connector.launch
+        # - export UAV_NAME=uav1; waitForOdometry; rosrun tf2_ros static_transform_publisher 0 0 0 0 0 0 $UAV_NAME/gps_origin gps_origin
+        # - export UAV_NAME=uav2; waitForOdometry; rosrun tf2_ros static_transform_publisher 0 0 0 0 0 0 $UAV_NAME/gps_origin gps_origin
+        # - export UAV_NAME=uav1; waitForRos; roslaunch mrs_rviz_plugins load_robot.launch
+        # - export UAV_NAME=uav2; waitForRos; roslaunch mrs_rviz_plugins load_robot.launch

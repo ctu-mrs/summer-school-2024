@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="2">
+
+  <name>mrim_planner</name>
+  <version>1.0.0</version>
+  <description>The MRIM Summer School 2022 planner</description>
+
+  <author email="pavel.petracek@fel.cvut.cz">Pavel Petracek</author>
+  <maintainer email="vit.kratky@fel.cvut.cz">Vit Kratky</maintainer>
+
+  <license>BSD-3</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+  <depend>mrim_resources</depend>
+  <depend>message_runtime</depend>
+
+  <export>
+  </export>
+
+</package>

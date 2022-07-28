@@ -1,0 +1,23 @@
+NAME: testing problem (two robots)
+COMMENT: Testing MRIM problem for MRS UAV Summer School 2022
+
+# ID X Y Z HEADING
+ROBOTS_START
+1 11.0 -8.0 1.0 1.57
+2  0.0 -8.0 1.0 1.57
+ROBOTS_END
+
+# ID X Y Z HEADING INSPECTABILITY
+INSPECTION_POINTS_START
+1 5.22 -4.69 3.86 -0.88 1
+2 6.38 -2.98 3.83 2.35 2
+3 5.79 -3.70 5.40 0.4 1 2
+4 5.79 -3.70 5.40 -2.8 1 2
+5 5.79 -3.70 5.40 2.38 1
+6 5.89 -3.80 5.43 -0.38 2
+INSPECTION_POINTS_END
+
+OBSTACLE_POINTS: single_tower.asc
+WORLD: single_tower.yaml
+
+EOF

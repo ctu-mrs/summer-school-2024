@@ -1,0 +1,58 @@
+print_info: False
+
+# Frames
+global_frame: "gps_origin"
+uav_names: ["uav1", "uav2"]
+
+# Dynamic constraints of the UAVs
+dynamic_constraints:
+  controller: "fast"            # controller constraints
+  max_velocity:             2.0 # (m/s)
+  max_acceleration:         1.5 # (m/s^2)
+  max_heading_rate:         0.5 # (rad/s)
+  max_heading_acceleration: 1.0 # (rad/s^2)
+
+# Trajectory parameters
+trajectories:
+  dt: 0.2 # (s)
+  min_distance:
+    mutual:    2.5 # (m)
+    obstacles: 1.5 # (m)
+
+  subscribe: True
+
+  # UNUSED
+  loading:
+    folder: "/home/vit/git/mrs_camp_april2022/power_line_mockup_lausanne/trajectories"
+    files:  ["trajectory_rotated_uav1.csv", "trajectory_rotated_uav47.csv", "trajectory_rotated_uav83.csv", "trajectory_rotated_uav7.csv"]
+
+# Viewpoints specifications
+viewpoints:
+  distance: 4.0 # (m)
+
+  inspection_limits:
+    distance: 0.3 # (m)
+    heading:  0.2 # (rad)
+    pitch:    0.2 # (rad)
+
+# Mission parameters
+mission:
+  timeout: 200.0 # (s)
+
+solution_time_constraint:
+  hard: 120.0
+  soft: 40.0
+
+# Cameras
+cameras:
+  red:
+    angle_of_view:
+      horizontal: 1.0 # (rad)
+      vertical:   0.7 # (rad)
+    fov_length:   2.0 # (m)
+
+  blue:
+    angle_of_view:
+      horizontal: 1.0 # (rad)
+      vertical:   0.5 # (rad)
+    fov_length:   3.0 # (m)

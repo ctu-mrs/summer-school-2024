@@ -1,0 +1,12 @@
+# Altitude state estimator:
+# HEIGHT - rangefinder, PLANE - height above plane estimated from realsense, BRICK - height above BRICK
+altitude_estimator: "BARO"
+
+# altitude estimation parameters# #{
+ 
+altitude:
+
+  # Altitude limits
+  max_default: 50.0 # Used only when safety area is not used
+  max_allowed_flight_height_garmin: 50.0 # Do not allow flying higher with garmin-based altitude estimator
+  
