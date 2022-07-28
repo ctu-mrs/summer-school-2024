@@ -117,16 +117,16 @@ Take a look here to see the trajectories' dynamic constraints or safety limits.
 A set of scripts is provided in `simulation/`, allowing you to start and stop the simulation and evaluate your code.
 The **bold** scripts are expected to be used directly by the user.
 
-| Script               | Description                                                          |
-| :---                 | :---:                                                                |
-| 01_install.sh        | install the Singularity software                                     |
-| 02_download.sh       | downloads the Singularity image                                      |
-| **03_compile.sh**    | compiles the user's software (no need for changes in Python scripts) |
-| **pycharm.sh**       | runs PyCharm inside Singularity                                      |
-| **run_offline.sh**   | runs the solution without Gazebo simulation                          |
-| run_simulation.sh**  | runs the solution inside Gazebo simulation                           |
-| kill_simulation.sh** | kills the running simulation environment                             |
-| Singularity.sh       | entry point to the Singularity's shell, not needed most of the time   |
+| Script                 | Description                                                          |
+| :---                   | :---:                                                                |
+| 01_install.sh          | install the Singularity software                                     |
+| 02_download.sh         | downloads the Singularity image                                      |
+| **03_compile.sh**      | compiles the user's software (no need for changes in Python scripts) |
+| **pycharm.sh**         | runs PyCharm inside Singularity                                      |
+| **run_offline.sh**     | runs the solution without Gazebo simulation                          |
+| **run_simulation.sh**  | runs the solution inside Gazebo simulation                           |
+| **kill_simulation.sh** | kills the running simulation environment                             |
+| Singularity.sh         | entry point to the Singularity's shell, not needed most of the time   |
 
 **1) Offline: lightweight without simulating UAV flight**
 
