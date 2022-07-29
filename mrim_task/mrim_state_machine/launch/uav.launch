@@ -2,9 +2,6 @@
 
   <arg name="uav_name" default="$(optenv UAV_NAME uav)"/>
   <arg name="standalone" default="false" />
-  
-  <arg name="SS_UAV_NAME_LEADER" default="$(optenv SS_UAV_NAME_LEADER)"/>
-  <arg name="SS_UAV_NAME_FOLLOWER" default="$(optenv SS_UAV_NAME_FOLLOWER)"/>
 
   <arg name="world_file" default="$(find mrs_uav_general)/config/worlds/world_cisar.yaml" />
 
@@ -17,7 +14,10 @@
   <arg unless="$(arg debug)" name="launch_prefix" value=""/>
   <arg     if="$(arg debug)" name="launch_prefix" value="debug_roslaunch"/>
 
-  <group if="$(eval arg('UAV_NAME') == arg('SS_UAV_NAME_LEADER'))" ns="$(arg uav_name)">
+  <arg name="uav1" default="uav3" />
+  <arg name="uav2" default="uav4" />
+
+  <group ns="$(arg uav_name)">
 
     <!-- Nodelet manager -->
     <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen" launch-prefix="$(arg launch_prefix)">
@@ -28,20 +28,20 @@
 
       <rosparam file="$(find mtsp_state_machine)/config/uav.yaml" />
       <rosparam file="$(arg world_file)" />
-      <param name="master_uav_name" value="$(arg SS_UAV_NAME_LEADER)" />
+      <param name="master_uav_name" value="$(arg uav1)" />
 
       <!-- Subscribers -->
-      <remap from="~mpc_diagnostics_1_in" to="/$(arg SS_UAV_NAME_LEADER)/control_manager/mpc_tracker/diagnostics" />
-      <remap from="~mpc_diagnostics_2_in" to="/$(arg SS_UAV_NAME_FOLLOWER)/control_manager/mpc_tracker/diagnostics" />
+      <remap from="~mpc_diagnostics_1_in" to="/$(arg uav1)/control_manager/mpc_tracker/diagnostics" />
+      <remap from="~mpc_diagnostics_2_in" to="/$(arg uav2)/control_manager/mpc_tracker/diagnostics" />
 
-      <remap from="~control_manager_diagnostics_1_in" to="/$(arg SS_UAV_NAME_LEADER)/control_manager/diagnostics" />
-      <remap from="~control_manager_diagnostics_2_in" to="/$(arg SS_UAV_NAME_FOLLOWER)/control_manager/diagnostics" />
+      <remap from="~control_manager_diagnostics_1_in" to="/$(arg uav1)/control_manager/diagnostics" />
+      <remap from="~control_manager_diagnostics_2_in" to="/$(arg uav2)/control_manager/diagnostics" />
 
       <remap from="~trajectory_1_in" to="mtsp_planner/trajectory_1" />
       <remap from="~trajectory_2_in" to="mtsp_planner/trajectory_2" />
 
-      <remap from="~odometry_1_in" to="/$(arg SS_UAV_NAME_LEADER)/odometry/odom_main" />
-      <remap from="~odometry_2_in" to="/$(arg SS_UAV_NAME_FOLLOWER)/odometry/odom_main" />
+      <remap from="~odometry_1_in" to="/$(arg uav1)/odometry/odom_main" />
+      <remap from="~odometry_2_in" to="/$(arg uav2)/odometry/odom_main" />
 
       <remap from="~problem_in" to="mtsp_problem_loader/tsp_problem" />
 
@@ -51,23 +51,23 @@
       <!-- Service clients -->
       <remap from="~load_trajectory_out" to="mtsp_problem_loader/start" />
 
-      <remap from="~validate_start_position_1_out" to="/$(arg SS_UAV_NAME_LEADER)/control_manager/validate_reference_2d" />
-      <remap from="~validate_start_position_2_out" to="/$(arg SS_UAV_NAME_FOLLOWER)/control_manager/validate_reference_2d" />
+      <remap from="~validate_start_position_1_out" to="/$(arg uav1)/control_manager/validate_reference_2d" />
+      <remap from="~validate_start_position_2_out" to="/$(arg uav2)/control_manager/validate_reference_2d" />
 
-      <remap from="~takeoff_1_out" to="/$(arg SS_UAV_NAME_LEADER)/mtsp_state_machine/ready_to_takeoff" />
-      <remap from="~takeoff_2_out" to="/$(arg SS_UAV_NAME_FOLLOWER)/mtsp_state_machine/ready_to_takeoff" />
+      <remap from="~takeoff_1_out" to="/$(arg uav1)/mtsp_state_machine/ready_to_takeoff" />
+      <remap from="~takeoff_2_out" to="/$(arg uav2)/mtsp_state_machine/ready_to_takeoff" />
 
-      <remap from="~land_1_out" to="/$(arg SS_UAV_NAME_LEADER)/uav_manager/land" />
-      <remap from="~land_2_out" to="/$(arg SS_UAV_NAME_FOLLOWER)/uav_manager/land" />
+      <remap from="~land_1_out" to="/$(arg uav1)/uav_manager/land" />
+      <remap from="~land_2_out" to="/$(arg uav2)/uav_manager/land" />
 
-      <remap from="~fly_to_start_1_out" to="/$(arg SS_UAV_NAME_LEADER)/control_manager/goto_trajectory_start" />
-      <remap from="~fly_to_start_2_out" to="/$(arg SS_UAV_NAME_FOLLOWER)/control_manager/goto_trajectory_start" />
+      <remap from="~fly_to_start_1_out" to="/$(arg uav1)/control_manager/goto_trajectory_start" />
+      <remap from="~fly_to_start_2_out" to="/$(arg uav2)/control_manager/goto_trajectory_start" />
 
-      <remap from="~start_following_1_out" to="/$(arg SS_UAV_NAME_LEADER)/control_manager/start_trajectory_tracking" />
-      <remap from="~start_following_2_out" to="/$(arg SS_UAV_NAME_FOLLOWER)/control_manager/start_trajectory_tracking" />
+      <remap from="~start_following_1_out" to="/$(arg uav1)/control_manager/start_trajectory_tracking" />
+      <remap from="~start_following_2_out" to="/$(arg uav2)/control_manager/start_trajectory_tracking" />
 
-      <remap from="~load_trajectory_1_out" to="/$(arg SS_UAV_NAME_LEADER)/control_manager/trajectory_reference" />
-      <remap from="~load_trajectory_2_out" to="/$(arg SS_UAV_NAME_FOLLOWER)/control_manager/trajectory_reference" />
+      <remap from="~load_trajectory_1_out" to="/$(arg uav1)/control_manager/trajectory_reference" />
+      <remap from="~load_trajectory_2_out" to="/$(arg uav2)/control_manager/trajectory_reference" />
 
       <!-- Service servers -->
       <remap from="~start_in" to="~start" />
