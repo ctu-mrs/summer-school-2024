@@ -4,11 +4,11 @@ connecting_frame_id:
 
 # root frame ids - names of frames, which are roots of the trees to be connected
 root_frame_ids:
-  ["uav47/fcu", "uav7/fcu"]
+  ["uav1/fcu", "uav2/fcu"]
 
 # names of frames in each tree, which are equal - this will be used to connect the trees
 equal_frame_ids:
-  ["uav47/rtk_origin", "uav7/rtk_origin"]
+  ["uav1/rtk_origin", "uav2/rtk_origin"]
 
 # these offsets will be applied to the transformation from the connecting frame to each of the root frames
 offsets:
