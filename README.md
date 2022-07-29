@@ -250,8 +250,8 @@ Your solution to both the challenges has to conform to constraints summarized in
 | Maximum solution time (soft):                       | 40 s              | 30 s                 |
 | Maximum solution time (hard):                       | 120 s             | 60 s                 |
 | Maximum mission time:                               | 200 s             | 180 s                |
-| Maximum velocity:                                   | 3 m/s             | 1 m/s                |
-| Maximum acceleration:                               | 2 m/s^2           | 1 m/s^2              |
+| Maximum velocity:                                   | 3 m/s             | 3 m/s                |
+| Maximum acceleration:                               | 2 m/s^2           | 2 m/s^2              |
 | Minimum obstacle distance:                          | 1.5 m             | 2.0 m                |
 | Minimum mutual distance:                            | 2.0 m             | 3.0 m                |
 | Dist. from starting position to stop the mission:\* | 1.0 m             | 1.0 m                |
