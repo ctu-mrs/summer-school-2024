@@ -410,7 +410,7 @@ class MrimManager:
             rospy.logerr("[MrimManager] TRAJECTORY CHECKS: {:s}".format(boolToString(overall_status)))
 
         # start overall status publishing
-        self.overall_status = flight_always_allowed or overall_status
+        self.overall_status = not run_type == 'uav' and (flight_always_allowed or overall_status)
         rospy.Timer(rospy.Duration(1), self.publishOverallStatus)
 
         # if overall_status:
@@ -912,8 +912,7 @@ class MrimManager:
         poses = []
         with self.uav_states_lock:
             for uav_state in self.uav_states:
-                if uav_state is not None:
-                    poses.append(uavStateMsgToTrajectoryPoint(uav_state))
+                poses.append(uavStateMsgToTrajectoryPoint(uav_state))
 
         if not self.evaluator_.checkFinalPositions(poses):
             with self.diag_msg_lock:

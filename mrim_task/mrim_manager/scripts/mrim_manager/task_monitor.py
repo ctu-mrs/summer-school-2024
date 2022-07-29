@@ -41,8 +41,7 @@ class TaskMonitor:
         first_poses_received = False
         self.poses = []
         for uav_state in initial_uav_states:
-            if uav_state is not None:
-                self.poses.append(uavStateMsgToTrajectoryPoint(uav_state))
+            self.poses.append(uavStateMsgToTrajectoryPoint(uav_state))
 
     def getFinalTime(self):
         return (self.final_time - self.start_time).to_sec()

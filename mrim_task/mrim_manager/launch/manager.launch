@@ -32,9 +32,9 @@
     <remap from="trajectory_1_in"       to="/mrim_planner/trajectory_1" />
     <remap from="trajectory_2_in"       to="/mrim_planner/trajectory_2" />
     <!-- TODO: needed in real world? -->
-    <remap from="uav_state_1_in"        to="/uav47/odometry/uav_state" />
+    <remap from="uav_state_1_in"        to="/uav1/odometry/uav_state" />
     <!-- TODO: needed in real world? -->
-    <remap from="uav_state_2_in"        to="/uav7/odometry/uav_state" />
+    <remap from="uav_state_2_in"        to="/uav2/odometry/uav_state" />
     <remap from="inspection_problem_in" to="/mrim_planner/problem" />
     <remap from="pause_playback_in"     to="/pause_playback" />
 
