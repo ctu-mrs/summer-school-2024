@@ -37,14 +37,13 @@
       <remap from="~control_manager_diagnostics_1_in" to="/$(arg SS_UAV_NAME_LEADER)/control_manager/diagnostics" />
       <remap from="~control_manager_diagnostics_2_in" to="/$(arg SS_UAV_NAME_FOLLOWER)/control_manager/diagnostics" />
 
-      <remap from="~trajectory_1_in" to="/mrim_planner/trajectory_1" />
-      <remap from="~trajectory_2_in" to="/mrim_planner/trajectory_2" />
+      <remap from="~trajectory_1_in" to="mtsp_planner/trajectory_1" />
+      <remap from="~trajectory_2_in" to="mtsp_planner/trajectory_2" />
 
       <remap from="~odometry_1_in" to="/$(arg SS_UAV_NAME_LEADER)/odometry/odom_main" />
       <remap from="~odometry_2_in" to="/$(arg SS_UAV_NAME_FOLLOWER)/odometry/odom_main" />
 
-      <remap from="~trajectories_valid_in" to="/mrim_manager/trajectories_valid" />
-      <!-- <remap from="~problem_in" to="/mrim_planner/problem" /> -->
+      <remap from="~problem_in" to="mtsp_problem_loader/tsp_problem" />
 
       <!-- Publishers -->
       <remap from="~visualization_marker_array_out" to="~visualization_marker_array" />
@@ -74,12 +73,6 @@
       <remap from="~start_in" to="~start" />
 
     </node>
-
-    <include file="$(find mrim_state_machine)/launch/tf_connector_uav.launch">
-
-      <arg name="standalone" value="$(arg standalone)" />
-
-    </include>
 
   </group>
 
