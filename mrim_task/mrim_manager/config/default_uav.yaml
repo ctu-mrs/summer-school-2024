@@ -1,5 +1,9 @@
 print_info: False
 
+problem:
+  name: "ac_mockup.problem"
+  plot: False
+
 # Frames
 global_frame: "rtk_origin"
 uav_names: ["uav1", "uav2"]
