@@ -33,24 +33,30 @@ cd ${HOME}/git/summer-school-2022 && ./install.sh
 
 ## Task overview
 
-You are given two UAVs (Red 🟥 and Blue 🟦) required to inspect a set of **inspections points (IPs)** while minimizing the overall inspection time.
+You are given two UAVs (Red 🟥 and Blue 🟦) required to inspect a set of **inspections points (IPs)** as fast as possible in a 3D environment with obstacles.
 The two UAVs are equipped with the [MRS control pipeline](https://github.com/ctu-mrs/uav_core) [1], allowing precise trajectory tracking.
-Your task is to assign the IPs to the UAVs and to generate multi-goal paths visiting **viewpoints (VPs)** (poses in which the particular IPs are inspected) of each IP while keeping a safe distance from obstacles and between the two UAVs.
-Furthermore, you are to generate collision-free time-parametrized trajectories from the paths that respect the UAVs' dynamic constraints.
+Your task is to assign the IPs to the UAVs and to generate multi-goal paths visiting **viewpoints (VPs)** (poses in which the particular IPs are inspected with on-board cameras) of each IP while keeping a safe distance from the obstacles and between the two UAVs.
+Furthermore, you shall convert paths to collision-free time-parametrized trajectories that respect the UAVs' dynamic constraints.
 The IPs are defined by their position and inspection angle and are divided into three subsets:
 
 1. 🔴 red locations: inspectable by 🟥 UAV only,
 2. 🔵 blue locations: inspectable by 🟦 UAV only,
 3. 🟣 purple locations: inspectable by both (🟥 or 🟦)  UAVs.
+ 
+![TASK](.fig/task.png)
 
-An IP is successfully inspected if any UAVs eligible to inspect this IP visit the VP within a radius of 0.3 m and with a maximum deviation in heading and pitch of 0.2 rad.
+To inspect an IP, you have to visit its attached VP with a correct UAV within a radius of 0.3 m and with a maximum deviation in inspection heading and pitch of 0.2 rad.
+**Each successfully inspected point increments your score by 1.**
+The overall objective is to maximize the score while minimizing the flight time of both the UAVs.
+
 The trajectories are required to begin and end at predefined starting locations.
-The mission starts when the trajectories following are started and ends once the UAVs stop at their starting locations.
+The mission starts when the trajectories following is started and ends once the UAVs stop at their starting locations.
 The motion blur effect during imaging is neglected; thus, the UAVs are not required to stop at particular VPs.
 
 ## Task assignment
 
-The available implemented solution consists of:
+There is a low-performance solution available at your hands.
+This solution consists of:
   * non-controlled heading of the UAVs,
   * random assignment of IPs in 🟣 to UAVs,
   * computation of TSP (Traveling Salesman Problem) tours using Euclidean distance estimates,
@@ -58,21 +64,20 @@ The available implemented solution consists of:
   * generation of trajectories with required zero velocity at the end of each straight segment,
   * collision avoidance is disabled.
 
-The solution produced by this approach has very poor performance and provides large space for improvement.
+The solution produced by this approach has very poor performance and does not score any points, yet provides large space for improvement.
 To improve the solution, you can follow the steps suggested below or find your way to improve the solution.
 Please go through the code and its inline comments to give you a better idea about individual tips.
 
 **Tips for improving the solution:**
 
-  1. Interpolate the heading between the samples.
+  1. Interpolate the heading between the samples. This is the first thing to solve if you want to score!
   2. Test different methods available for estimating the distance between the VPs and for planning collision-free paths connecting the VPs [available planners: A*, RRT (default), RRT*].
   3. Improve assignment of inspected points from 🟣 between the two UAVs (random by default).
   4. Try different parameters of path planners (e.g., grid resolution or sampling distance) and evaluate their impact on the quality of your solution.
   5. Increase performance of the chosen path planner (e.g., by path straightening or implementing informed RRT).
   6. Consider flight time instead of path length when searching for the optimal sequence of locations in TSP.
   7. Apply path smoothing and continuous trajectory sampling (no stops at waypoints) to speed up the flight. In the code, we have prepared the `toppra` library for computing path parametrizations [2]. Check out the documentation and try to utilize it.
-  8. Postprocess the time-parametrized trajectories to resolve collisions. Start by improving the implemented collision avoidance, e.g., by delaying trajectory start till there is no collision.
-Moreover, whole trajectories or parts of them can be resampled such that a receding horizon is free of collisions.
+  8. Postprocess the time-parametrized trajectories to resolve collisions. Start by improving the implemented collision avoidance, e.g., by delaying trajectory start till there is no collision. Tip: try the methods available for you in the config file (see below).
   9. Effectively redistribute IPs to avoid collisions and to achieve lower inspection time.
 
 Note that the task in its generality is very complex to be solved in a limited time during several days.
@@ -94,7 +99,7 @@ Change your code within directory `summer-school-2022/mrim_task/mrim_planner` in
 
   * `scripts/`
     * `planner.py`: Crossroad script where the path to your solution begins. Here you will find initial ideas and examples on how to load parameters.
-    * `trajectory.py`: Contains functionalities for basic work with trajectories. Here, you can interpolate heading between the path waypoints and experiment with smoothing the paths, sampling the trajectories, computing collisions between points/paths/trajectories, or postprocessing trajectories to prevent collisions.
+    * `trajectory.py`: Contains functionalities for basic work with trajectories. Here, you can **interpolate heading** between the path waypoints and experiment with smoothing the paths, sampling the trajectories, computing collisions between points/paths/trajectories, or postprocessing trajectories to prevent collisions.
     * `solvers/`
       * `tsp_solvers.py`: This is where VPs assignment for TSP, path planning, and solving TSP happens. Here you can play with an efficient assignment of VPs to UAVs or study the effect of path planners on TSP solution performance.
     * `utils.py`: Default source of various utility functions. Feel free to add your own.
@@ -126,7 +131,7 @@ The **bold** scripts are expected to be used directly by the user.
 | **run_offline.sh**     | runs the solution without Gazebo simulation                          |
 | **run_simulation.sh**  | runs the solution inside Gazebo simulation                           |
 | **kill_simulation.sh** | kills the running simulation environment                             |
-| Singularity.sh         | entry point to the Singularity's shell, not needed most of the time   |
+| singularity.sh         | entry point to the Singularity's shell, not needed most of the time   |
 
 **1) Offline: lightweight without simulating UAV flight**
 
@@ -217,18 +222,17 @@ Please include the names of all team members in the email message.
 The evaluation of particular solutions in the real-world challenge will be performed on Friday, August 5th, with the real-time score presentation.
 The virtual challenge will be evaluated on Friday.
 The results will be presented during an awards ceremony organized at the experimental site after the real-world challenge.
-The final score of the solution equals the total number of successfully inspected IPs.
-In case of a tie, the inspection time will be used as a secondary key to determining the ranking of the teams.
+**The final score of the solution equals the sum of successfully inspected IPs.**
 
-Reasons to assign zero score:
+**Reasons to assign zero score (and thus to disqualify the solution):**
 
   1. violation of assigned dynamic constraints of UAVs,
   2. violation of minimum allowed distance between obstacles and UAVs,
   3. violation of minimum allowed mutual distance between UAVs,
   4. violation of maximum distance of final trajectory point to the predefined starting location,
   5. exceeding the hard maximum available time for computing a solution (see the table below).
-
-**In the case of exceeding the soft maximum available time for computing a solution, the time exceeding the unpenalized solution time will be added to the inspection time.**
+   
+In case of a tie, **secondary key** to determine the final order of the participating teams is given as `$T_I + T_P$ (sec)`, where `$T_I$` is the inspection time (start to end of both trajectories) and `$T_P = max(0, T_C - T_s$)` is the time `$T_C$` it took to compute the solution minus the the soft limit `$T_s$` for computing the solution (see table below).
 
 ### Virtual
 
