@@ -53,8 +53,8 @@
     <remap from="~validate_start_position_1_out" to="/$(arg SS_UAV_NAME_1)/control_manager/validate_reference_2d" />
     <remap from="~validate_start_position_2_out" to="/$(arg SS_UAV_NAME_2)/control_manager/validate_reference_2d" />
 
-    <remap from="~takeoff_1_out" to="/mrim_state_machine/ready_to_takeoff_1" />
-    <remap from="~takeoff_2_out" to="/mrim_state_machine/ready_to_takeoff_2" />
+    <remap from="~takeoff_1_out" to="/$(arg SS_UAV_NAME_1)/mrim_state_machine/ready_to_takeoff" />
+    <remap from="~takeoff_2_out" to="/$(arg SS_UAV_NAME_2)/mrim_state_machine/ready_to_takeoff" />
 
     <remap from="~land_1_out" to="/$(arg SS_UAV_NAME_1)/uav_manager/land" />
     <remap from="~land_2_out" to="/$(arg SS_UAV_NAME_2)/uav_manager/land" />
