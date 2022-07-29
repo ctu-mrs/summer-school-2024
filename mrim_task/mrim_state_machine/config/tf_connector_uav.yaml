@@ -1,0 +1,35 @@
+# the connecting root frame will be named like this
+connecting_frame_id:
+  "rtk_origin"
+
+# root frame ids - names of frames, which are roots of the trees to be connected
+root_frame_ids:
+  ["uav1/fcu", "uav2/fcu"]
+
+# names of frames in each tree, which are equal - this will be used to connect the trees
+equal_frame_ids:
+  ["uav1/rtk_origin", "uav2/rtk_origin"]
+
+# these offsets will be applied to the transformation from the connecting frame to each of the root frames
+offsets:
+  # these are applied in the root frame (typically fcu frame, hence intrinsic)
+  intrinsic:
+    [
+      [ # if this is another array, it will be interpreted as transformation keyframes that will be interpolated between based on their stamps
+        [0.0, 0.0, 0.0, 0.0, 0.0], # five numbers are interpreted as stamp,x,y,z,yaw
+        [0.0, 0.0, 0.0, 0.0, 0.0], # five numbers are interpreted as stamp,x,y,z,yaw
+      ],
+      [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0], # seven numbers are interpreted as x,y,z,qx,qy,qz,qw (the last four are a quaternion)
+    ]
+  # these are applied in the leaf (equal) frame (typically static frame, hence extrinsic)
+  extrinsic:
+    [
+      [0.0, 0.0, 0.0, 0.0], # four numbers are interpreted as x,y,z,yaw
+      [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0], # seven numbers are interpreted as x,y,z,qx,qy,qz,qw (the last four are a quaternion)
+    ]
+
+# if true, older messages than the last update of the respective frame connection will be ignored
+ignore_older_messages: false
+
+# if no update of a certain connection happens for this duration, it will be forced
+max_update_period: 0.1 # seconds (set to zero to disable)
