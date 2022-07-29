@@ -56,7 +56,7 @@ The available implemented solution consists of:
   * computation of TSP (Traveling Salesman Problem) tours using Euclidean distance estimates,
   * planning paths with the use of badly parametrized RRT planner,
   * generation of trajectories with required zero velocity at the end of each straight segment,
-  * collision avoidance achieved by starting second-UAV trajectory after the first UAV finishes its flight.
+  * collision avoidance is disabled.
 
 The solution produced by this approach has very poor performance and provides large space for improvement.
 To improve the solution, you can follow the steps suggested below or find your way to improve the solution.
