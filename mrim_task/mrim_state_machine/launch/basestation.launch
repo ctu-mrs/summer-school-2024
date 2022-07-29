@@ -1,5 +1,6 @@
 <launch>
 
+  <arg name="uav_name" default="$(optenv UAV_NAME uav)"/>
   <arg name="standalone" default="false" />
   
   <arg name="SS_UAV_NAME_1" default="$(optenv SS_UAV_NAME_1)"/>
@@ -77,9 +78,6 @@
     <arg name="standalone" value="$(arg standalone)" />
 
   </include>
-  
-  <node pkg="tf2_ros" type="static_transform_publisher" name="rtk_origin_1" args="0 0 0 0 0 0 rtk_origin $(arg SS_UAV_NAME_1)/rtk_origin" />
-  <node pkg="tf2_ros" type="static_transform_publisher" name="rtk_origin_2" args="0 0 0 0 0 0 rtk_origin $(arg SS_UAV_NAME_2)/rtk_origin" />
 
 
 </launch>
