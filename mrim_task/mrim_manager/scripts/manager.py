@@ -441,37 +441,36 @@ class MrimManager:
 
         # #{ RVIZ TRAJECTORIES AND STATISTICS VISUALIZATION
 
-        if visualization_rviz:
+        rate = rospy.Rate(0.2)
+        playback_speed = playback_speed if visualization_rviz else 1000 # avoid waiting for score if rViz not used 
 
-            rate = rospy.Rate(0.2)
+        if run_type == 'offline':
+            while not rospy.is_shutdown():
+                self.visualizer_.publishObstacles()
+                self.visualizer_.publishSafetyArea()
+                self.visualizer_.publishPaths(self.trajectories)
+                self.visualizer_.publishCollisions(self.trajectories, collisions_between_uavs)
+                self.runOfflineTrajectoryPlayback(self.trajectories, odometry_publishers, playback_speed, trajectory_dt, uav_obstacle_distances,\
+                                           mutual_distances, minimum_obstacle_distance, minimum_mutual_distance)
+                self.evaluator_.resetScore()
+                rate.sleep()
+        elif run_type == 'simulation' or run_type == 'uav':
 
-            if run_type == 'offline':
-                while not rospy.is_shutdown():
-                    self.visualizer_.publishObstacles()
-                    self.visualizer_.publishSafetyArea()
-                    self.visualizer_.publishPaths(self.trajectories)
-                    self.visualizer_.publishCollisions(self.trajectories, collisions_between_uavs)
-                    self.runOfflineTrajectoryPlayback(self.trajectories, odometry_publishers, playback_speed, trajectory_dt, uav_obstacle_distances,\
-                                               mutual_distances, minimum_obstacle_distance, minimum_mutual_distance)
-                    self.evaluator_.resetScore()
-                    rate.sleep()
-            elif run_type == 'simulation' or run_type == 'uav':
+            if not overall_status:
+                for k in range(len(self.trajectories)):
+                    jsk_msg = self.visualizer_.generateJskMsg(self.trajectories[k].trajectory_name, self.trajectories[k].length, self.trajectories[k].time, \
+                                                              self.trajectories[k].min_obst_dist.item(), self.trajectories[k].min_mutual_dist,\
+                                                              self.trajectories[k].dynamics_ok)
+                    self.visualizer_.publishJskMsg(jsk_msg, self.trajectories[k].overall_status, k)
 
-                if not overall_status:
-                    for k in range(len(self.trajectories)):
-                        jsk_msg = self.visualizer_.generateJskMsg(self.trajectories[k].trajectory_name, self.trajectories[k].length, self.trajectories[k].time, \
-                                                                  self.trajectories[k].min_obst_dist.item(), self.trajectories[k].min_mutual_dist,\
-                                                                  self.trajectories[k].dynamics_ok)
-                        self.visualizer_.publishJskMsg(jsk_msg, self.trajectories[k].overall_status, k)
+                self.visualizer_.publishFullScreenMsg("------ Constraints violated! ------\n ------ Takeoff not allowed! ------")
+                rate.sleep()
 
-                    self.visualizer_.publishFullScreenMsg("------ Constraints violated! ------\n ------ Takeoff not allowed! ------")
-                    rate.sleep()
-
-                if overall_status or (not run_type == 'uav' and flight_always_allowed):
-                    self.visualizer_.publishFullScreenMsg("")
-                    self.runSimulationMonitoring(self.trajectories, minimum_obstacle_distance, minimum_mutual_distance)
-            else:
-                rospy.logwarn('[MrimManager] Unexpected run type: %s', run_type)
+            if overall_status or (not run_type == 'uav' and flight_always_allowed):
+                self.visualizer_.publishFullScreenMsg("")
+                self.runSimulationMonitoring(self.trajectories, minimum_obstacle_distance, minimum_mutual_distance)
+        else:
+            rospy.logwarn('[MrimManager] Unexpected run type: %s', run_type)
 
         # #} end of RVIZ TRAJECTORIES AND STATISTICS VISUALIZATION
 
@@ -857,7 +856,8 @@ class MrimManager:
         self.visualizer_.publishStartPositions()
         self.visualizer_.publishPlaybackStatus(self.playback_paused)
 
-        solution_time_penalty = self.checkMaximumSolutionTime()
+        solution_time, solution_time_penalty = self.checkMaximumSolutionTime()
+        self.visualizer_.publishSolutionTime(self.solution_time_constraint_hard - solution_time, solution_time_penalty)
 
         while trajectory_idx < max_len:
             if not self.playback_paused:
@@ -889,7 +889,8 @@ class MrimManager:
         self.visualizer_.publishPaths(trajectories)
         self.visualizer_.publishFullScreenMsg("")
 
-        solution_time_penalty = self.checkMaximumSolutionTime()
+        solution_time, solution_time_penalty = self.checkMaximumSolutionTime()
+        self.visualizer_.publishSolutionTime(self.solution_time_constraint_hard - solution_time, solution_time_penalty)
 
         with self.uav_states_lock:
             self.task_monitor = TaskMonitor(trajectories, self.pcl_map, self.uav_states, minimum_obstacle_distance, minimum_mutual_distance)
@@ -954,7 +955,6 @@ class MrimManager:
                 with self.diag_msg_lock:
                     msg = "Minimum mutual distance violated!"
                     if not msg in self.diag_msgs:
-                        print("Message already in the list, not adding")
                         self.diag_msgs.append(msg)
 
         if not self.mission_time_exceeded and trajectory_idx*trajectories[0].dt > self.mission_time_limit:
@@ -994,7 +994,6 @@ class MrimManager:
                 with self.diag_msg_lock:
                     msg = "Minimum mutual distance violated!"
                     if not msg in self.diag_msgs:
-                        print("Message already in the list, not adding")
                         self.diag_msgs.append(msg)
 
         if not self.mission_time_exceeded and mission_time > self.mission_time_limit:
@@ -1022,7 +1021,7 @@ class MrimManager:
         elif solution_time > self.solution_time_constraint_soft:
             solution_time_penalty = solution_time - self.solution_time_constraint_soft
 
-        return solution_time_penalty
+        return solution_time, solution_time_penalty
 
     # #} end of checkMaximumSolutionTime()
 
