@@ -2,25 +2,22 @@
 
 set -e
 
-distro=`lsb_release -r | awk '{ print $2 }'`
-[ "$distro" = "18.04" ] && ROS_DISTRO="melodic"
-[ "$distro" = "20.04" ] && ROS_DISTRO="noetic"
-
 echo "Starting install preparation"
 
 sudo apt-get -y install git
 
-echo "clone mrs_uav_system"
+echo ""
+echo "cloning the repository"
+echo ""
+
 cd
 mkdir git
 cd git
-git clone https://github.com/ctu-mrs/mrs_uav_system.git
-cd mrs_uav_system
+git clone https://github.com/ctu-mrs/summer-school-2022
+cd summer-school-2022
 echo "running the main install.sh"
-./install.sh -g "$HOME/git" -m "false"
-
-echo "installing summer_school_2022 dependencies"
-cd $GITHUB_WORKSPACE
 ./install.sh
 
+echo ""
 echo "installation part ended"
+echo ""

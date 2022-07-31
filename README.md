@@ -1,5 +1,8 @@
 # MRS Summer School 2022: multi-robot inspection and monitoring
 
+| Status       | 18.04                                                                                                                                      | 20.04                                                                                                                                     | 22.04                                                                                                                                     |
+| Installation | [Status](https://github.com/ctu-mrs/summer-school-2022/workflows/Bionic/badge.svg)](https://github.com/ctu-mrs/summer-school-2022/actions) | [Status](https://github.com/ctu-mrs/summer-school-2022/workflows/Focal/badge.svg)](https://github.com/ctu-mrs/summer-school-2022/actions) | [Status](https://github.com/ctu-mrs/summer-school-2022/workflows/Jammy/badge.svg)](https://github.com/ctu-mrs/summer-school-2022/actions) |
+
 In this Summer School task, we will focus on the cooperation of a group of two UAVs (Unmanned Aerial Vehicles) in a 3D environment with obstacles.
 The task is to plan collision-free trajectories of the UAVs so that cameras onboard the UAVs inspect a set of *N* unique inspection points.
 Both UAVs have a predefined starting position and a limit on maximal velocity and acceleration.
@@ -42,7 +45,7 @@ The IPs are defined by their position and inspection angle and are divided into 
 1. 🔴 red locations: inspectable by 🟥 UAV only,
 2. 🔵 blue locations: inspectable by 🟦 UAV only,
 3. 🟣 purple locations: inspectable by both (🟥 or 🟦)  UAVs.
- 
+
 ![TASK](.fig/task.png)
 
 To inspect an IP, you have to visit its attached VP with a correct UAV within a radius of 0.3 m and with a maximum deviation in inspection heading and pitch of 0.2 rad.
@@ -231,7 +234,7 @@ The results will be presented during an awards ceremony organized at the experim
   3. violation of minimum allowed mutual distance between UAVs,
   4. violation of maximum distance of final trajectory point to the predefined starting location,
   5. exceeding the hard maximum available time for computing a solution (see the table below).
-   
+
 In case of a tie, **secondary key** to determine the final order of the participating teams is given as $T_I + T_P$ (in seconds), where $T_I$ is the inspection time (start to end of both trajectories) and $T_P = max(0, T_C - T_s)$ is the time $T_C$ it took to compute the solution minus the the soft limit $T_s$ for computing the solution (see table below).
 
 ### Virtual
