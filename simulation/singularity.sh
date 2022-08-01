@@ -124,10 +124,19 @@ fi
 NVIDIA_COUNT_1=$( lspci | grep -i -e "vga.*nvidia" | wc -l )
 NVIDIA_COUNT_2=$( command -v nvidia-smi >> /dev/null 2>&1 && (nvidia-smi -L | grep -i "gpu" | wc -l) || echo 0 )
 
-# if we have nvidia, add the "--nv" arg
+# if we have nvidia hardware, add the "--nv" arg
 if [ "$NVIDIA_COUNT_1" -ge "1" ] || [ "$NVIDIA_COUNT_2" -ge "1" ]; then
-  NVIDIA_ARG="--nv"
-  $DEBUG && echo "Debug: using nvidia (nvidia counts: $NVIDIA_COUNT_1, $NVIDIA_COUNT_2)"
+
+  # check if nvidia is active
+  NVIDIA_NOT_ACTIVE=$( command -v nvidia-smi >> /dev/null 2>&1 && ( nvidia-smi | grep -i "NVIDIA-SMI has failed" | wc -l ) || echo 0 )
+
+  if [ "$NVIDIA_NOT_ACTIVE" -ge "1" ]; then
+    echo "Warning: nvidia graphics detected, however, it is not used. Starting without using nvidia."
+    NVIDIA_ARG=""
+  else
+    NVIDIA_ARG="--nv"
+    $DEBUG && echo "Debug: using nvidia (nvidia counts: $NVIDIA_COUNT_1, $NVIDIA_COUNT_2)"
+  fi
 else
   NVIDIA_ARG=""
 fi
