@@ -13,7 +13,7 @@ echo ""
 cd
 mkdir git
 cd git
-git clone https://github.com/ctu-mrs/summer-school-2022
+ln -s $GITHUB_WORKSPACE summer-school-2022
 cd summer-school-2022
 echo "running the main install.sh"
 ./install.sh

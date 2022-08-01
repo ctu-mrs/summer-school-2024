@@ -454,6 +454,12 @@ class MrimManager:
                                            mutual_distances, minimum_obstacle_distance, minimum_mutual_distance)
                 self.evaluator_.resetScore()
                 rate.sleep()
+
+                if not visualization_rviz:
+                    rospy.loginfo('[MrimManager] Killing ros nodes')
+                    os.system("pkill roslaunch")
+                    break
+
         elif run_type == 'simulation' or run_type == 'uav':
 
             if not overall_status:

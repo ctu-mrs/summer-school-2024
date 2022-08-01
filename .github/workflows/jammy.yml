@@ -39,3 +39,6 @@ jobs:
 
       - name: Install
         run: ./.ci/install.sh
+
+      - name: Run
+        run: ./.ci/run.sh
