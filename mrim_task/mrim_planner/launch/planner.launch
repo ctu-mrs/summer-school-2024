@@ -1,6 +1,7 @@
 <launch>
 
   <arg name="RUN_TYPE" default="offline"/>
+  <arg name="RVIZ_GUI" default="1" />
 
   <!-- DO NOT CHANGE BELOW -->
 
@@ -25,6 +26,7 @@
   <include file="$(find mrim_manager)/launch/manager.launch" >
 
     <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
+    <arg name="RVIZ_GUI" value="$(arg RVIZ_GUI)" />
 
   </include>
 

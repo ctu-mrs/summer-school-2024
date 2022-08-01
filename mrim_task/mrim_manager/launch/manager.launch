@@ -1,6 +1,7 @@
 <launch>
 
   <arg name="RUN_TYPE"           default="offline" />
+  <arg name="RVIZ_GUI"           default="1" />
 
   <arg name="config"             default="" />
   <arg name="config/constraints" default="" />
@@ -24,6 +25,7 @@
     <!-- Parameters -->
     <param name="rviz_config" value="$(find mrim_manager)/config/rviz/$(arg RUN_TYPE).rviz" />
     <param name="run_type" value="$(arg RUN_TYPE)" />
+    <param unless="$(arg RVIZ_GUI)" name="visualization/rviz/use" value="0" />
 
     # Remap service servers
     <remap from="start_monitoring_in"       to="~start_monitoring" />
