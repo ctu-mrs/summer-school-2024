@@ -39,8 +39,6 @@ INSTALL_GO=true
 # check if go is already installed
 if [ -e /usr/local/go/bin ]; then
 
-  echo pes
-
   default=n
   while true; do
     if [[ "$unattended" == "1" ]]
