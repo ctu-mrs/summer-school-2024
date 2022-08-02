@@ -241,11 +241,16 @@ class TrajectoryUtils():
         dist_total = distEuclidean(start, stop)
         #print("dist_total", dist_total)
 
-        time_from_init_to_max_vel  = (self.max_velocity - init_velocity) / self.max_acceleration
-        time_from_max_to_final_vel = (self.max_velocity - final_velocity) / self.max_acceleration
+        # [STUDENTS TODO] Rework the method to per-axis computation if you want to exploit the allowed dynamics in all axes
+        # Set minimal velocity/acceleration to the axis limit with minimal constraint
+        min_ax_vel = min(self.max_velocity)
+        min_ax_acc = min(self.max_acceleration)
 
-        dist_from_init_to_max_vel  = 0.5 * (self.max_velocity + init_velocity) * time_from_init_to_max_vel  # average speed * time
-        dist_from_max_vel_to_final = 0.5 * (self.max_velocity + final_velocity) * time_from_max_to_final_vel  # average speed * time
+        time_from_init_to_max_vel  = (min_ax_vel - init_velocity) / min_ax_acc
+        time_from_max_to_final_vel = (min_ax_vel - final_velocity) / min_ax_acc
+
+        dist_from_init_to_max_vel  = 0.5 * (min_ax_vel + init_velocity) * time_from_init_to_max_vel  # average speed * time
+        dist_from_max_vel_to_final = 0.5 * (min_ax_vel + final_velocity) * time_from_max_to_final_vel  # average speed * time
 
         """
         print("time_from_init_to_max_vel", time_from_init_to_max_vel, "s")
@@ -261,26 +266,26 @@ class TrajectoryUtils():
 
             if init_velocity == 0 and final_velocity == 0:
 
-                time_to_possible_max_vel = math.sqrt(dist_total / self.max_acceleration)
-                velocity_in_middle       = time_to_possible_max_vel * self.max_acceleration
+                time_to_possible_max_vel = math.sqrt(dist_total / min_ax_acc)
+                velocity_in_middle       = time_to_possible_max_vel * min_ax_acc
                 trajectory_part_time     = 2 * time_to_possible_max_vel
 
             elif init_velocity > final_velocity:  # initial velocity is larger than final, in the end is additinal decelerating
 
-                time_final_decel         = (init_velocity - final_velocity) / self.max_acceleration
+                time_final_decel         = (init_velocity - final_velocity) / min_ax_acc
                 dist_final_decel         = time_final_decel * (init_velocity + final_velocity) * 0.5
                 dist_acc_decc            = dist_total - dist_final_decel
-                time_to_possible_max_vel = (-init_velocity + math.sqrt(init_velocity ** 2 + self.max_acceleration * dist_acc_decc)) / self.max_acceleration
-                velocity_in_middle       = init_velocity + time_to_possible_max_vel * self.max_acceleration
+                time_to_possible_max_vel = (-init_velocity + math.sqrt(init_velocity ** 2 + min_ax_acc * dist_acc_decc)) / min_ax_acc
+                velocity_in_middle       = init_velocity + time_to_possible_max_vel * min_ax_acc
                 trajectory_part_time     = time_to_possible_max_vel + time_final_decel
 
             else:
 
-                time_init_accel          = (final_velocity - init_velocity) / self.max_acceleration
+                time_init_accel          = (final_velocity - init_velocity) / min_ax_acc
                 dist_init_accel          = time_init_accel * (init_velocity + final_velocity) * 0.5
                 dist_acc_decc            = dist_total - dist_init_accel
-                time_to_possible_max_vel = time_init_accel + (-final_velocity + math.sqrt(final_velocity ** 2 + self.max_acceleration * dist_acc_decc)) / self.max_acceleration
-                velocity_in_middle       = init_velocity + time_to_possible_max_vel * self.max_acceleration
+                time_to_possible_max_vel = time_init_accel + (-final_velocity + math.sqrt(final_velocity ** 2 + min_ax_acc * dist_acc_decc)) / min_ax_acc
+                velocity_in_middle       = init_velocity + time_to_possible_max_vel * min_ax_acc
 
                 """
                 print("time_init_accel", time_init_accel)
@@ -300,8 +305,8 @@ class TrajectoryUtils():
             while (sample + 1) * self.dT <= time_to_possible_max_vel - sample_start_time:
 
                 t = (sample + 1) * self.dT + sample_start_time
-                v = init_velocity + self.max_acceleration * t
-                s = init_velocity * t + 0.5 * self.max_acceleration * (t ** 2)
+                v = init_velocity + min_ax_acc * t
+                s = init_velocity * t + 0.5 * min_ax_acc * (t ** 2)
 
                 pose_in_dist = poseInDistance(start, stop, s)
                 poses.append(pose_in_dist)
@@ -315,8 +320,8 @@ class TrajectoryUtils():
 
                 t      = (sample + 1) * self.dT + sample_start_time
                 t_part = t - time_to_possible_max_vel
-                v      = velocity_in_middle - self.max_acceleration * t_part
-                s      = time_to_possible_max_vel * 0.5 * (velocity_in_middle + init_velocity) + velocity_in_middle * t_part - 0.5 * self.max_acceleration * (t_part ** 2)
+                v      = velocity_in_middle - min_ax_acc * t_part
+                s      = time_to_possible_max_vel * 0.5 * (velocity_in_middle + init_velocity) + velocity_in_middle * t_part - 0.5 * min_ax_acc * (t_part ** 2)
 
                 pose_in_dist = poseInDistance(start, stop, s)
                 poses.append(pose_in_dist)
@@ -329,7 +334,7 @@ class TrajectoryUtils():
 
             #print("can reach max vel")
             dist_constant_speed  = dist_total - dist_from_init_to_max_vel - dist_from_max_vel_to_final
-            time_constant_speed  = dist_constant_speed / self.max_velocity
+            time_constant_speed  = dist_constant_speed / min_ax_vel
             trajectory_part_time = time_from_init_to_max_vel + time_constant_speed + time_from_max_to_final_vel
 
             """
@@ -342,8 +347,8 @@ class TrajectoryUtils():
             while (sample + 1) * self.dT <= time_from_init_to_max_vel - sample_start_time:
 
                 t = (sample + 1) * self.dT + sample_start_time
-                v = init_velocity + self.max_acceleration * t
-                s = init_velocity * t + 0.5 * self.max_acceleration * (t ** 2)
+                v = init_velocity + min_ax_acc * t
+                s = init_velocity * t + 0.5 * min_ax_acc * (t ** 2)
 
                 pose_in_dist = poseInDistance(start, stop, s)
                 poses.append(pose_in_dist)
@@ -356,7 +361,7 @@ class TrajectoryUtils():
 
                 t      = (sample + 1) * self.dT + sample_start_time
                 t_part = t - time_from_init_to_max_vel
-                v      = self.max_velocity
+                v      = min_ax_vel
                 s      = dist_from_init_to_max_vel + v * t_part
 
                 pose_in_dist = poseInDistance(start, stop, s)
@@ -370,8 +375,8 @@ class TrajectoryUtils():
 
                 t      = (sample + 1) * self.dT + sample_start_time
                 t_part = t - (time_from_init_to_max_vel + time_constant_speed)
-                v      = self.max_velocity - self.max_acceleration * t_part
-                s      = (dist_total - dist_from_max_vel_to_final) + self.max_velocity * t_part - 0.5 * self.max_acceleration * (t_part ** 2)
+                v      = min_ax_vel - min_ax_acc * t_part
+                s      = (dist_total - dist_from_max_vel_to_final) + min_ax_vel * t_part - 0.5 * min_ax_acc * (t_part ** 2)
 
                 pose_in_dist = poseInDistance(start, stop, s)
                 poses.append(pose_in_dist)
@@ -517,7 +522,7 @@ class TrajectoryUtils():
                 # TODO: slow down continually instead of as fast as possible
 
                 # Slow down with maximal deceleration
-                stopping_dist  = min(0.0, min_velocity * self.dT - 0.5 * self.max_acceleration * (self.dT ** 2))
+                stopping_dist  = min(0.0, min_velocity * self.dT - 0.5 * min_ax_acc * (self.dT ** 2))
 
                 # Compute the sample pose
                 stopping_start = traj_poses[min_velocity_idx]
@@ -763,7 +768,7 @@ class TrajectoryUtils():
         shorter_idx, longer_idx = np.argmin(traj_times), np.argmax(traj_times)
 
         # Compute hysteresis window (max stopping length)
-        max_stop_time = self.max_velocity / self.max_acceleration
+        max_stop_time = max([self.max_velocity[i] / self.max_acceleration[i] for i in range(3)])
         hysteresis    = int(np.ceil(max_stop_time / self.dT))
 
         # Iterate over the collisions list

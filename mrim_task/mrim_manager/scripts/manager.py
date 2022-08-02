@@ -191,23 +191,23 @@ class MrimManager:
 
         # ends if constraints cannot be loaded
 
-        h_speed = rospy.get_param('~' + constraint_type + '/horizontal/speed')
-        h_acc = rospy.get_param('~' + constraint_type + '/horizontal/acceleration')
+        h_speed = rospy.get_param('~dynamic_constraints/max_velocity/x')
+        h_acc = rospy.get_param('~dynamic_constraints/max_acceleration/x')
         h_jerk = rospy.get_param('~' + constraint_type + '/horizontal/jerk')
         h_snap = rospy.get_param('~' + constraint_type + '/horizontal/snap')
 
-        va_speed = rospy.get_param('~' + constraint_type + '/vertical/ascending/speed')
-        va_acc = rospy.get_param('~' + constraint_type + '/vertical/ascending/acceleration')
+        va_speed = rospy.get_param('~dynamic_constraints/max_velocity/z')
+        va_acc = rospy.get_param('~dynamic_constraints/max_acceleration/z')
         va_jerk = rospy.get_param('~' + constraint_type + '/vertical/ascending/jerk')
         va_snap = rospy.get_param('~' + constraint_type + '/vertical/ascending/snap')
 
-        vd_speed = rospy.get_param('~' + constraint_type + '/vertical/descending/speed')
-        vd_acc = rospy.get_param('~' + constraint_type + '/vertical/descending/acceleration')
+        vd_speed = rospy.get_param('~dynamic_constraints/max_velocity/z')
+        vd_acc = rospy.get_param('~dynamic_constraints/max_acceleration/z')
         vd_jerk = rospy.get_param('~' + constraint_type + '/vertical/descending/jerk')
         vd_snap = rospy.get_param('~' + constraint_type + '/vertical/descending/snap')
 
-        heading_speed = rospy.get_param('~' + constraint_type + '/heading/speed')
-        heading_acc = rospy.get_param('~' + constraint_type + '/heading/acceleration')
+        heading_speed = rospy.get_param('~dynamic_constraints/max_heading_rate')
+        heading_acc = rospy.get_param('~dynamic_constraints/max_heading_acceleration')
         heading_jerk = rospy.get_param('~' + constraint_type + '/heading/jerk')
         heading_snap = rospy.get_param('~' + constraint_type + '/heading/snap')
 
@@ -532,7 +532,11 @@ class MrimManager:
                 jerks_xy.append(np.sqrt(trajectories[k].jerks[m].x**2 + trajectories[k].jerks[m].y**2))
                 snaps_xy.append(np.sqrt(trajectories[k].snaps[m].x**2 + trajectories[k].snaps[m].y**2))
 
+            vels_x = [vel.x for vel in trajectories[k].velocities]
+            vels_y = [vel.y for vel in trajectories[k].velocities]
             vels_z = [vel.z for vel in trajectories[k].velocities]
+            accs_x = [acc.x for acc in trajectories[k].accelerations]
+            accs_y = [acc.y for acc in trajectories[k].accelerations]
             accs_z = [acc.z for acc in trajectories[k].accelerations]
             jerks_z = [jerk.z for jerk in trajectories[k].jerks]
             snaps_z = [snap.z for snap in trajectories[k].snaps]
@@ -544,11 +548,15 @@ class MrimManager:
             # #{ LIMITING VALUES
 
             max_vel_xy = max(abs(np.array(vels_xy)))
+            max_vel_x = max(abs(np.array(vels_x)))
+            max_vel_y = max(abs(np.array(vels_y)))
             max_vel_desc = abs(min(np.array(vels_z)))
             max_vel_asc = abs(max(np.array(vels_z)))
             max_vel_heading = max(abs(np.array(vels_heading)))
 
             max_acc_xy = max(abs(np.array(accs_xy)))
+            max_acc_x = max(abs(np.array(accs_x)))
+            max_acc_y = max(abs(np.array(accs_y)))
             max_acc_desc = abs(min(np.array(accs_z)))
             max_acc_asc = abs(max(np.array(accs_z)))
             max_acc_heading = max(abs(np.array(accs_heading)))
@@ -569,11 +577,15 @@ class MrimManager:
 
             # check constraints
             vel_xy_ok = max_vel_xy < constraints.horizontal.speed
+            vel_x_ok = max_vel_x < constraints.horizontal.speed
+            vel_y_ok = max_vel_y < constraints.horizontal.speed
             vel_desc_ok = max_vel_desc < constraints.descending.speed
             vel_asc_ok = max_vel_asc < constraints.ascending.speed
             vel_heading_ok = max_vel_heading < constraints.heading.speed
 
             acc_xy_ok = max_acc_xy < constraints.horizontal.acceleration
+            acc_x_ok = max_acc_x < constraints.horizontal.acceleration
+            acc_y_ok = max_acc_y < constraints.horizontal.acceleration
             acc_desc_ok = max_acc_desc < constraints.descending.acceleration
             acc_asc_ok = max_acc_asc < constraints.ascending.acceleration
             acc_heading_ok = max_acc_heading < constraints.heading.acceleration
@@ -600,15 +612,17 @@ class MrimManager:
 
             rospy.loginfo("[MrimManager] [{:s}] Dynamic constraints of: {:s}:".format(boolToString(ok), self.trajectories[k].trajectory_name))
             rospy.loginfo("[MrimManager]    speed: [{:s}]".format(boolToString(ok_vel)))
-            rospy.loginfo("[MrimManager]      - [{:s}] horizontal: {:.2f} (max: {:.2f}) m/s".format(boolToString(vel_xy_ok), max_vel_xy, constraints.horizontal.speed))
+            rospy.loginfo("[MrimManager]      - [{:s}] horizontal x: {:.2f} (max: {:.2f}) m/s".format(boolToString(vel_x_ok), max_vel_x, constraints.horizontal.speed))
+            rospy.loginfo("[MrimManager]      - [{:s}] horizontal y: {:.2f} (max: {:.2f}) m/s".format(boolToString(vel_y_ok), max_vel_y, constraints.horizontal.speed))
             rospy.loginfo("[MrimManager]      - [{:s}] descending: {:.2f} (max: {:.2f}) m/s".format(boolToString(vel_desc_ok), max_vel_desc, constraints.descending.speed))
             rospy.loginfo("[MrimManager]      - [{:s}] ascending:  {:.2f} (max: {:.2f}) m/s".format(boolToString(vel_asc_ok), max_vel_asc, constraints.ascending.speed))
-            rospy.loginfo("[MrimManager]      - [{:s}] heading:    {:.2f} (max: {:.2f}) rad/s".format(boolToString(vel_heading_ok), max_vel_heading, constraints.heading.speed))
+            rospy.loginfo("[MrimManager]      - [{:s}] heading:    {:.2f} (max: {:.2f}) rad/s{:s}".format(boolToString(vel_heading_ok), max_vel_heading, constraints.heading.speed, '' if vel_heading_ok else ' => the task will run but precise control of the heading is not assured'))
             rospy.loginfo("[MrimManager]    acceleration: [{:s}]".format(boolToString(ok_acc)))
-            rospy.loginfo("[MrimManager]      - [{:s}] horizontal: {:.2f} (max: {:.2f}) m/s^2".format(boolToString(acc_xy_ok), max_acc_xy, constraints.horizontal.acceleration))
+            rospy.loginfo("[MrimManager]      - [{:s}] horizontal x: {:.2f} (max: {:.2f}) m/s^2".format(boolToString(acc_x_ok), max_acc_x, constraints.horizontal.acceleration))
+            rospy.loginfo("[MrimManager]      - [{:s}] horizontal y: {:.2f} (max: {:.2f}) m/s^2".format(boolToString(acc_y_ok), max_acc_y, constraints.horizontal.acceleration))
             rospy.loginfo("[MrimManager]      - [{:s}] descending: {:.2f} (max: {:.2f}) m/s^2".format(boolToString(acc_desc_ok), max_acc_desc, constraints.descending.acceleration))
             rospy.loginfo("[MrimManager]      - [{:s}] ascending:  {:.2f} (max: {:.2f}) m/s^2".format(boolToString(acc_asc_ok), max_acc_asc, constraints.ascending.acceleration))
-            rospy.loginfo("[MrimManager]      - [{:s}] heading:    {:.2f} (max: {:.2f}) rad/s^2".format(boolToString(acc_heading_ok), max_acc_heading, constraints.heading.acceleration))
+            rospy.loginfo("[MrimManager]      - [{:s}] heading:    {:.2f} (max: {:.2f}) rad/s^2{:s}".format(boolToString(acc_heading_ok), max_acc_heading, constraints.heading.acceleration, '' if acc_heading_ok else ' => the task will run but precise control of the heading is not assured'))
             # rospy.loginfo("[MrimManager]    jerk: [{:s}]".format(boolToString(ok_jerk)))
             # rospy.loginfo("[MrimManager]      - [{:s}] horizontal: {:.2f} (max: {:.2f}) m/s^3".format(boolToString(jerk_xy_ok), max_jerk_xy, constraints.horizontal.jerk))
             # rospy.loginfo("[MrimManager]      - [{:s}] descending: {:.2f} (max: {:.2f}) m/s^3".format(boolToString(jerk_desc_ok), max_jerk_desc, constraints.descending.jerk))
@@ -623,7 +637,7 @@ class MrimManager:
             # #} end of COMMAN LINE OUTPUTS
 
             # constraints_check_successful = vel_xy_ok and vel_asc_ok and vel_desc_ok and vel_heading_ok and acc_xy_ok and acc_asc_ok and acc_desc_ok and acc_heading_ok and jerk_xy_ok and jerk_asc_ok and jerk_desc_ok and jerk_heading_ok and snap_xy_ok and snap_asc_ok and snap_desc_ok and snap_heading_ok
-            constraints_check_successful = vel_xy_ok and vel_asc_ok and vel_desc_ok and vel_heading_ok and acc_xy_ok and acc_asc_ok and acc_desc_ok and acc_heading_ok
+            constraints_check_successful = vel_x_ok and vel_y_ok and vel_asc_ok and vel_desc_ok and vel_heading_ok and acc_xy_ok and acc_x_ok and acc_y_ok and acc_asc_ok and acc_desc_ok and acc_heading_ok
 
             # if constraints_check_successful:
             #     rospy.loginfo("[MrimManager] ##### Constraints for trajectory %s not violated. #####", trajectories[k].trajectory_name)

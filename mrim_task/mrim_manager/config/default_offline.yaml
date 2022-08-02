@@ -7,10 +7,17 @@ uav_names: ["uav1", "uav2"]
 # Dynamic constraints of the UAVs
 dynamic_constraints:
   controller: "fast"            # controller constraints
-  max_velocity:             2.0 # (m/s)
-  max_acceleration:         1.5 # (m/s^2)
+  max_velocity:             
+    x: 2.0 # (m/s)
+    y: 2.0 # (m/s)
+    z: 1.0 # (m/s)
+  max_acceleration:             
+    x: 2.0 # (m/s2)
+    y: 2.0 # (m/s2)
+    z: 1.0 # (m/s2)
   max_heading_rate:         0.5 # (rad/s)
   max_heading_acceleration: 1.0 # (rad/s^2)
+
 
 # Trajectory parameters
 trajectories:

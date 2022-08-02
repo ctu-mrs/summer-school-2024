@@ -33,10 +33,6 @@ class MrimPlanner:
 
         ## |  load parameters from ROS custom config (mrim_task/mrim_planner/config/custom_config.yaml)  |
         self._viewpoints_distance      = rospy.get_param('~viewpoints/distance', 3.0)
-        self._max_velocity             = rospy.get_param('~dynamic_constraints/max_velocity', 4.0)
-        self._max_acceleration         = rospy.get_param('~dynamic_constraints/max_acceleration', 2.0)
-        self._max_heading_rate         = rospy.get_param('~dynamic_constraints/max_heading_rate', 1.0)
-        self._max_heading_acceleration = rospy.get_param('~dynamic_constraints/max_heading_rate_acceleration', 1.0)
         self._plot                     = rospy.get_param('~problem/plot', False)
         self._trajectory_dt            = rospy.get_param('~trajectories/dt', 0.2)
         self._smoothing_sampling_step  = rospy.get_param('~path_smoothing/sampling_step', 0.1)
@@ -44,6 +40,17 @@ class MrimPlanner:
         self._sample_with_stops        = rospy.get_param('~trajectory_sampling/with_stops', True)
         self._global_frame             = rospy.get_param('~global_frame', "gps_origin")
         self._tsp_clustering_method    = rospy.get_param('~tsp/clustering', 'random')
+
+        max_vel_x                      = rospy.get_param('~dynamic_constraints/max_velocity/x', 1.0)
+        max_vel_y                      = rospy.get_param('~dynamic_constraints/max_velocity/y', 1.0)
+        max_vel_z                      = rospy.get_param('~dynamic_constraints/max_velocity/z', 1.0)
+        max_acc_x                      = rospy.get_param('~dynamic_constraints/max_acceleration/x', 1.0)
+        max_acc_y                      = rospy.get_param('~dynamic_constraints/max_acceleration/y', 1.0)
+        max_acc_z                      = rospy.get_param('~dynamic_constraints/max_acceleration/z', 1.0)
+        self._max_velocity             = (max_vel_x, max_vel_y, max_vel_z)
+        self._max_acceleration         = (max_acc_x, max_acc_y, max_acc_z)
+        self._max_heading_rate         = rospy.get_param('~dynamic_constraints/max_heading_rate', 1.0)
+        self._max_heading_acceleration = rospy.get_param('~dynamic_constraints/max_heading_rate_acceleration', 1.0)
 
         ## | ---------------- setup collision avoidance --------------- |
         self._safety_distance_mutual = rospy.get_param('~trajectories/min_distance/mutual')
@@ -194,8 +201,8 @@ class MrimPlanner:
         trajectories     = []
 
         # create dynamic constraints
-        constraints_velocity     = [self._max_velocity, self._max_velocity, self._max_velocity, self._max_heading_rate] # per axis velocity limits
-        constraints_acceleration = [self._max_acceleration, self._max_acceleration, self._max_acceleration, self._max_heading_acceleration] # per axis acceleration limits
+        constraints_velocity     = [self._max_velocity[0], self._max_velocity[1], self._max_velocity[2], self._max_heading_rate] # per axis velocity limits
+        constraints_acceleration = [self._max_acceleration[0], self._max_acceleration[1], self._max_acceleration[2], self._max_heading_acceleration] # per axis acceleration limits
 
         ## | ------------------- Sample waypoints ------------------ |
         print("[PRE COLLISION AVOIDANCE] for robot with ID: {:d}".format(problem.robot_ids[r]))
