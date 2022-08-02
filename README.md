@@ -230,7 +230,7 @@ The results will be presented during an awards ceremony organized at the experim
 
 **Reasons to assign zero score (and thus to disqualify the solution):**
 
-  1. violation of assigned dynamic constraints of UAVs,
+  1. violation of assigned dynamic constraints of UAVs (**in horizontal and vertical directions only**; violation of constraints on heading does not affect the score but beware that the heading rate/acceleration of the UAV controller will be limited by these constraints),
   2. violation of minimum allowed distance between obstacles and UAVs,
   3. violation of minimum allowed mutual distance between UAVs,
   4. violation of maximum distance of final trajectory point to the predefined starting location,
@@ -258,8 +258,10 @@ Your solution to both the challenges has to conform to constraints summarized in
 | Maximum solution time (soft):                       | 40 s              | 30 s                 |
 | Maximum solution time (hard):                       | 120 s             | 60 s                 |
 | Maximum mission time:                               | 200 s             | 180 s                |
-| Maximum velocity:                                   | 3 m/s             | 3 m/s                |
-| Maximum acceleration:                               | 2 m/s^2           | 2 m/s^2              |
+| Maximum velocity per x and y axes:                  | 2 m/s             | 1 m/s                |
+| Maximum velocity in z axis:                         | 1 m/s             | 0.5 m/s              |
+| Maximum acceleration per x and y axes:              | 2 m/s^2           | 1 m/s^2              |
+| Maximum acceleration in z axis:                     | 1 m/s^2           | 0.5 m/s^2            |
 | Minimum obstacle distance:                          | 1.5 m             | 2.0 m                |
 | Minimum mutual distance:                            | 2.0 m             | 3.0 m                |
 | Dist. from starting position to stop the mission:\* | 1.0 m             | 1.0 m                |

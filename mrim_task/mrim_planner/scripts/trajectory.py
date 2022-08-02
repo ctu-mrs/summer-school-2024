@@ -241,6 +241,8 @@ class TrajectoryUtils():
         dist_total = distEuclidean(start, stop)
         #print("dist_total", dist_total)
 
+        # [STUDENTS TODO] Rework the method to per-axis computation if you want to exploit the allowed dynamics in all axes
+        # Set minimal velocity/acceleration to the axis limit with minimal constraint
         min_ax_vel = min(self.max_velocity)
         min_ax_acc = min(self.max_acceleration)
 
