@@ -25,13 +25,13 @@ from mrim_manager.utils import *
 # #{ class TaskMonitor
 
 class TaskMonitor:
-    def __init__(self, trajectories, pcl_kdtree, initial_uav_states, obst_dist_limit, mutual_dist_limit):
+    def __init__(self, trajectories, pcl_kdtree, initial_uav_states, obst_dist_limit, mutual_dist_limit, dynamics_checks_ok):
         self.min_mutual_dists = [1e6, 1e6]
         self.min_obstacle_dists = [1e6, 1e6]
         self.velocities = [0, 0]
         self.accelerations = [0, 0]
         self.travelled_dists = [0, 0]
-        self.overall_statuses = [True, True]
+        self.overall_statuses = dynamics_checks_ok
         self.mission_time = 0.0
         self.start_time = 0.0
         self.final_time = 0.0
