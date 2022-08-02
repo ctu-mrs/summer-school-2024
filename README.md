@@ -25,6 +25,7 @@ Requirements: Linux OS, approx. 5 GB of HDD space.
 For a non-Ubuntu OS, please, install the Singularity on your own.
 
 1) If you are a `git` veteran, you should `fork` the git repository [github.com/ctu-mrs/summer-school-2022](https://github.com/ctu-mrs/summer-school-2022). This will allow you to store changes to our code. Do not forget to make your fork private unless you want other participants to be able to peek into your code.
+__UPDATE:__ Forked repositories on github cannot be made private. Workaround: Instead of forking the repository, click the plus sign in the top right corner, select Import repository, type in the original repo address `https://github.com/ctu-mrs/summer-school-2022.git` and then the name of your new repository. In the bottom part of the form, you can select Private. 
 2) Clone the repository to `~/git`:
 ```bash
 mkdir -p ${HOME}/git
