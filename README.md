@@ -263,6 +263,8 @@ Your solution to both the challenges has to conform to constraints summarized in
 | Maximum velocity in z axis:                         | 1 m/s             | 0.5 m/s              |
 | Maximum acceleration per x and y axes:              | 2 m/s^2           | 1 m/s^2              |
 | Maximum acceleration in z axis:                     | 1 m/s^2           | 0.5 m/s^2            |
+| Maximum heading rate:                               | 0.5 rad/s         | 0.5 rad/s            |
+| Maximum heading acceleration:                       | 1 rad/s^2         | 1 rad/s^2            |
 | Minimum obstacle distance:                          | 1.5 m             | 2.0 m                |
 | Minimum mutual distance:                            | 2.0 m             | 3.0 m                |
 | Dist. from starting position to stop the mission:\* | 1.0 m             | 1.0 m                |
