@@ -210,6 +210,7 @@ class MrimManager:
         heading_acc = rospy.get_param('~dynamic_constraints/max_heading_acceleration')
         heading_jerk = rospy.get_param('~' + constraint_type + '/heading/jerk')
         heading_snap = rospy.get_param('~' + constraint_type + '/heading/snap')
+        self.constraints_violation_tolerance = rospy.get_param('~dynamic_constraints/tolerance')
 
         self.constraints = Constraints(DynamicConstraint(h_speed, h_acc, h_jerk, h_snap), DynamicConstraint(va_speed, va_acc, va_jerk, va_snap), DynamicConstraint(vd_speed, vd_acc, vd_jerk, vd_snap), DynamicConstraint(heading_speed, heading_acc, heading_jerk, heading_snap))
 
@@ -474,7 +475,7 @@ class MrimManager:
 
             if overall_status or (not run_type == 'uav' and flight_always_allowed):
                 self.visualizer_.publishFullScreenMsg("")
-                self.runSimulationMonitoring(self.trajectories, minimum_obstacle_distance, minimum_mutual_distance)
+                self.runSimulationMonitoring(self.trajectories, minimum_obstacle_distance, minimum_mutual_distance, dynamic_constraints_ok_list)
         else:
             rospy.logwarn('[MrimManager] Unexpected run type: %s', run_type)
 
@@ -576,19 +577,19 @@ class MrimManager:
             # #{ CONSTRAINTS CHECK
 
             # check constraints
-            vel_xy_ok = max_vel_xy < constraints.horizontal.speed
-            vel_x_ok = max_vel_x < constraints.horizontal.speed
-            vel_y_ok = max_vel_y < constraints.horizontal.speed
-            vel_desc_ok = max_vel_desc < constraints.descending.speed
-            vel_asc_ok = max_vel_asc < constraints.ascending.speed
-            vel_heading_ok = max_vel_heading < constraints.heading.speed
+            vel_xy_ok = max_vel_xy < constraints.horizontal.speed + self.constraints_violation_tolerance
+            vel_x_ok = max_vel_x < constraints.horizontal.speed + self.constraints_violation_tolerance
+            vel_y_ok = max_vel_y < constraints.horizontal.speed + self.constraints_violation_tolerance
+            vel_desc_ok = max_vel_desc < constraints.descending.speed + self.constraints_violation_tolerance
+            vel_asc_ok = max_vel_asc < constraints.ascending.speed + self.constraints_violation_tolerance
+            vel_heading_ok = max_vel_heading < constraints.heading.speed + self.constraints_violation_tolerance
 
-            acc_xy_ok = max_acc_xy < constraints.horizontal.acceleration
-            acc_x_ok = max_acc_x < constraints.horizontal.acceleration
-            acc_y_ok = max_acc_y < constraints.horizontal.acceleration
-            acc_desc_ok = max_acc_desc < constraints.descending.acceleration
-            acc_asc_ok = max_acc_asc < constraints.ascending.acceleration
-            acc_heading_ok = max_acc_heading < constraints.heading.acceleration
+            acc_xy_ok = max_acc_xy < constraints.horizontal.acceleration + self.constraints_violation_tolerance
+            acc_x_ok = max_acc_x < constraints.horizontal.acceleration + self.constraints_violation_tolerance
+            acc_y_ok = max_acc_y < constraints.horizontal.acceleration + self.constraints_violation_tolerance
+            acc_desc_ok = max_acc_desc < constraints.descending.acceleration + self.constraints_violation_tolerance
+            acc_asc_ok = max_acc_asc < constraints.ascending.acceleration + self.constraints_violation_tolerance
+            acc_heading_ok = max_acc_heading < constraints.heading.acceleration + self.constraints_violation_tolerance
 
             jerk_xy_ok = max_jerk_xy < constraints.horizontal.jerk
             jerk_desc_ok = max_jerk_desc < constraints.descending.jerk
@@ -604,8 +605,8 @@ class MrimManager:
 
             # #{ COMMAND LINE OUTPUTS
 
-            ok_vel = vel_xy_ok and vel_desc_ok and vel_asc_ok and vel_heading_ok
-            ok_acc = acc_xy_ok and acc_desc_ok and acc_asc_ok and acc_heading_ok
+            ok_vel = vel_x_ok and vel_y_ok and vel_desc_ok and vel_asc_ok and vel_heading_ok
+            ok_acc = acc_x_ok and acc_y_ok and acc_desc_ok and acc_asc_ok and acc_heading_ok
             ok_jerk = jerk_xy_ok and jerk_desc_ok and jerk_asc_ok and jerk_heading_ok
             ok_snap = snap_xy_ok and snap_desc_ok and snap_asc_ok and snap_heading_ok
             ok = ok_vel and ok_acc
@@ -637,7 +638,11 @@ class MrimManager:
             # #} end of COMMAN LINE OUTPUTS
 
             # constraints_check_successful = vel_xy_ok and vel_asc_ok and vel_desc_ok and vel_heading_ok and acc_xy_ok and acc_asc_ok and acc_desc_ok and acc_heading_ok and jerk_xy_ok and jerk_asc_ok and jerk_desc_ok and jerk_heading_ok and snap_xy_ok and snap_asc_ok and snap_desc_ok and snap_heading_ok
-            constraints_check_successful = vel_x_ok and vel_y_ok and vel_asc_ok and vel_desc_ok and vel_heading_ok and acc_xy_ok and acc_x_ok and acc_y_ok and acc_asc_ok and acc_desc_ok and acc_heading_ok
+            translation_constraints_check_successful = vel_x_ok and vel_y_ok and vel_asc_ok and vel_desc_ok and  acc_x_ok and acc_y_ok and acc_asc_ok and acc_desc_ok 
+            constraints_check_successful = translation_constraints_check_successful and vel_heading_ok and acc_heading_ok
+
+            if not translation_constraints_check_successful:
+                self.evaluator_.setZeroScore()
 
             # if constraints_check_successful:
             #     rospy.loginfo("[MrimManager] ##### Constraints for trajectory %s not violated. #####", trajectories[k].trajectory_name)
@@ -900,7 +905,7 @@ class MrimManager:
 
     # #{ runSimulationMonitoring()
 
-    def runSimulationMonitoring(self, trajectories, minimum_obstacle_distance, minimum_mutual_distance):
+    def runSimulationMonitoring(self, trajectories, minimum_obstacle_distance, minimum_mutual_distance, dynamic_constraints_ok_list):
         rospy.loginfo_once("[MrimManager] Running simulation monitoring.")
 
         self.visualizer_.publishObstacles()
@@ -913,7 +918,7 @@ class MrimManager:
         self.visualizer_.publishSolutionTime(self.solution_time_constraint_hard - solution_time, solution_time_penalty)
 
         with self.uav_states_lock:
-            self.task_monitor = TaskMonitor(trajectories, self.pcl_map, self.uav_states, minimum_obstacle_distance, minimum_mutual_distance)
+            self.task_monitor = TaskMonitor(trajectories, self.pcl_map, self.uav_states, minimum_obstacle_distance, minimum_mutual_distance, dynamic_constraints_ok_list)
 
         # init subscriber to have goal
         srv_start_monitoring = rospy.Service('start_monitoring_in', Trigger, self.startMonitoringCallback)

@@ -6,7 +6,8 @@ uav_names: ["uav1", "uav2"]
 
 # Dynamic constraints of the UAVs
 dynamic_constraints:
-  controller: "fast"            # controller constraints
+  controller: "fast" # controller constraints
+  tolerance: 0.01 # acceptable violation of constraints
   max_velocity:             
     x: 2.0 # (m/s)
     y: 2.0 # (m/s)
