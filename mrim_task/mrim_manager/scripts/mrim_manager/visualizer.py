@@ -108,7 +108,7 @@ class Visualizer:
                 global_options_found = False
             elif "uav1" in line:
                 new_line = re.sub("uav1", uav_name_1, line)
-            elif "uav1" in line:
+            elif "uav2" in line:
                 new_line = re.sub("uav2", uav_name_2, line)
             else:
                 new_line = line

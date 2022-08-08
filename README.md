@@ -258,7 +258,7 @@ Your solution to both the challenges has to conform to constraints summarized in
 | :---                                                | :---:             | :---:                |
 | Maximum solution time (soft):                       | 40 s              | 30 s                 |
 | Maximum solution time (hard):                       | 120 s             | 60 s                 |
-| Maximum mission time:                               | 200 s             | 180 s                |
+| Maximum mission time:                               | 200 s             | 240 s                |
 | Maximum velocity per x and y axes:                  | 2 m/s             | 1 m/s                |
 | Maximum velocity in z axis:                         | 1 m/s             | 0.5 m/s              |
 | Maximum acceleration per x and y axes:              | 2 m/s^2           | 1 m/s^2              |

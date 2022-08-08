@@ -165,10 +165,10 @@ class Trajectory:
         self.poses = waypoint_list
         self.dt = dt
         self.trajectory_name = trajectory_name
-        self.velocities = self.getDerivation(self.poses, self.dt, True)
-        self.accelerations = self.getDerivation(self.velocities, self.dt, False)
-        self.jerks = self.getDerivation(self.accelerations, self.dt, False)
-        self.snaps = self.getDerivation(self.jerks, self.dt, False)
+        self.velocities = self.getDerivation(self.poses, self.dt, True, True)
+        self.accelerations = self.getDerivation(self.velocities, self.dt, False, False)
+        self.jerks = self.getDerivation(self.accelerations, self.dt, False, False)
+        self.snaps = self.getDerivation(self.jerks, self.dt, False, False)
         self.cummulative_length = self.getCummulativeLength(self.poses)
         self.abs_velocities = self.getNorms(self.velocities)
         self.abs_accelerations = self.getNorms(self.accelerations)
@@ -178,7 +178,7 @@ class Trajectory:
         self.min_mutual_dist = -1
         self.dynamics_ok = False
 
-    def getDerivation(self, vector, dt, wrap_heading):
+    def getDerivation(self, vector, dt, wrap_heading, first_derivation):
         derivatives = []
         derivatives.append(Vector4d(0.0, 0.0, 0.0, 0.0))
 
@@ -186,7 +186,10 @@ class Trajectory:
             dx = (vector[k].x - vector[k-1].x)/dt
             dy = (vector[k].y - vector[k-1].y)/dt
             dz = (vector[k].z - vector[k-1].z)/dt
-            dheading = self.getHeadingDiff(vector[k-1].heading, vector[k].heading) if wrap_heading else (vector[k].heading - vector[k-1].heading)/dt
+            if first_derivation: 
+                dheading = self.getHeadingDiff(vector[k-1].heading, vector[k].heading)/dt if wrap_heading else (vector[k].heading - vector[k-1].heading)/dt
+            else:
+                dheading = (vector[k].heading - vector[k-1].heading)/dt
             derivatives.append(Vector4d(dx, dy, dz, dheading))
 
         derivatives.append(Vector4d(0.0, 0.0, 0.0, 0.0))
@@ -217,7 +220,7 @@ class Trajectory:
         h1n = math.atan2(np.sin(h1), np.cos(h1))
         h2n = math.atan2(np.sin(h2), np.cos(h2))
         diff = h2n - h1n
-        diffn = diff if abs(diff) < math.pi else np.sign(diff) * 2*math.pi - diff
+        diffn = diff if abs(diff) < math.pi else -np.sign(diff) * (2*math.pi - abs(diff))
         return diffn
 
     def setStatistics(self, min_obst_dist, min_mutual_dist, dynamics_ok, overall_status):

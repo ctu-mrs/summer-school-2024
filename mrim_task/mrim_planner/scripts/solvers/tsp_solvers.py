@@ -55,17 +55,18 @@ class TSPSolver3D():
 
             # construct grid
             x_list = [opt.x for opt in problem.obstacle_points]
-            x_list.extend([tar.pose.point.x for tar in viewpoints])
+            x_list.extend([vp.pose.point.x for vp in viewpoints])
             y_list = [opt.y for opt in problem.obstacle_points]
-            y_list.extend([tar.pose.point.y for tar in viewpoints])
+            y_list.extend([vp.pose.point.y for vp in viewpoints])
             z_list = [opt.z for opt in problem.obstacle_points]
-            z_list.extend([tar.pose.point.z for tar in viewpoints])
-            min_x = np.min(x_list)
-            max_x = np.max(x_list)
-            min_y = np.min(y_list)
-            max_y = np.max(y_list)
-            min_z = np.min(z_list)
-            max_z = np.max(z_list)
+            z_list.extend([vp.pose.point.z for vp in viewpoints])
+
+            min_x = np.min(x_list) - path_planner['safety_distance']
+            max_x = np.max(x_list) + path_planner['safety_distance']
+            min_y = np.min(y_list) - path_planner['safety_distance']
+            max_y = np.max(y_list) + path_planner['safety_distance']
+            min_z = problem.min_height
+            max_z = problem.max_height
 
             dim_x = int(np.ceil((max_x - min_x) / path_planner['astar/grid_resolution']))+1
             dim_y = int(np.ceil((max_y - min_y) / path_planner['astar/grid_resolution']))+1

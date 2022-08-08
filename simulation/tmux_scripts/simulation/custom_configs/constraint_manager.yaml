@@ -10,43 +10,46 @@ constraint_management:
   # list of allowed gains per odometry mode
   allowed_constraints:
     GPS: ["mrim"]
+    RTK: ["mrim"]
 
   # those gains will be used automatically when a localization mode switches
   # and the current gains are not in the allowed list (next paragraphs)
   fallback_constraints:
     GPS: "mrim"
+    RTK: "mrim"
 
 mrim:
 
   horizontal:
     speed: 4.0
     acceleration: 2.0
-    jerk: 3.0
-    snap: 10.0
+    jerk: 40.0
+    snap: 40.0
 
   vertical:
 
     ascending:
-      speed: 4.0
-      acceleration: 2.0
-      jerk: 3.0
-      snap: 5.0
+      speed: 2.0
+      acceleration: 1.5
+      jerk: 40.0
+      snap: 40.0
 
     descending:
-      speed: 4.0
-      acceleration: 2.0
-      jerk: 3.0
-      snap: 5.0
+      speed: 2.0
+      acceleration: 1.5
+      jerk: 40.0
+      snap: 40.0
 
   heading:
-    speed: 1.0
+    speed: 0.5
     acceleration: 1.0
-    jerk: 3.0
-    snap: 5.0
+    jerk: 20.0
+    snap: 20.0
 
   angular_speed:
     roll: 60.0
     pitch: 60.0
-    yaw: 2.0
+    yaw: 10.0
 
   tilt: deg(60)
+

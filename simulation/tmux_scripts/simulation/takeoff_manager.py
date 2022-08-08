@@ -36,7 +36,7 @@ if __name__ == "__main__":
     rospy.loginfo("Initializing subscribers.")
 
     for k in range(len(uav_names)):
-        rospy.Subscriber("/" + uav_names[k] + "/mrim_state_machine/ready_to_takeoff", UInt8, callbackReadyToTakeoff, k)
+        rospy.Subscriber("/mrim_state_machine/ready_to_takeoff_" + str(k + 1), UInt8, callbackReadyToTakeoff, k)
 
     rospy.loginfo("Waiting for UAVs' services.")
     arming_srv_list = []

@@ -1,4 +1,7 @@
 <launch>
+
+  <arg name="RUN_TYPE" />
+
   <!-- other args -->
   <arg name="standalone" default="true" />
   <arg name="debug" default="false" />
@@ -13,7 +16,9 @@
 
   <node pkg="nodelet" type="nodelet" name="tf_connector" args="$(arg nodelet) tf_connector/TFConnector $(arg nodelet_manager)" output="screen" launch-prefix="$(arg launch_prefix)">
 
-    <rosparam file="$(find mrim_state_machine)/config/tf_connector.yaml" />
+    <!-- UAV names for UAV -->
+    <rosparam if="$(eval arg('RUN_TYPE') == 'uav')"     file="$(find mrim_state_machine)/config/tf_connector_uav.yaml" />
+    <rosparam unless="$(eval arg('RUN_TYPE') == 'uav')" file="$(find mrim_state_machine)/config/tf_connector_simulation.yaml" />
 
       <!-- Subscribers -->
     <remap from="~tf_in" to="/tf" />

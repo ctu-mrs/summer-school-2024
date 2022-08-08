@@ -18,7 +18,7 @@ from sklearn.neighbors import KDTree
 import sensor_msgs
 import sensor_msgs.point_cloud2
 from std_msgs.msg import ColorRGBA, Float32, Empty, Bool
-from std_srvs.srv import Trigger
+from std_srvs.srv import Trigger, SetBool
 from nav_msgs.msg import Path, Odometry
 from geometry_msgs.msg import PoseStamped, PoseArray, Pose, Point, Quaternion, Vector3, TransformStamped
 from mrs_msgs.msg import TrajectoryReference, UavState
@@ -162,8 +162,8 @@ class MrimManager:
         visualization_rviz = rospy.get_param('~visualization/rviz/use')
         playback_speed = rospy.get_param('~visualization/rviz/playback_speed')
         trajectory_dt = rospy.get_param('~trajectories/dt')
-        minimum_mutual_distance = rospy.get_param('~trajectories/min_distance/mutual')
-        minimum_obstacle_distance = rospy.get_param('~trajectories/min_distance/obstacles')
+        minimum_mutual_distance = rospy.get_param('~trajectories/check/mutual')
+        minimum_obstacle_distance = rospy.get_param('~trajectories/check/obstacles')
         rviz_config = rospy.get_param('~rviz_config')
         self.print_info = rospy.get_param('~print_info')
         global_frame = rospy.get_param('~global_frame')
@@ -184,6 +184,7 @@ class MrimManager:
         uav_names = rospy.get_param("~uav_names")
         self.solution_time_constraint_hard = rospy.get_param("~solution_time_constraint/hard")
         self.solution_time_constraint_soft = rospy.get_param("~solution_time_constraint/soft")
+        self.rviz_proc = None
 
         # #{ LOAD CONSTRAINTS
 
@@ -253,6 +254,8 @@ class MrimManager:
         self.uav_states = [None, None] # expects two UAVs only
         self.solution_time_start = -1.0
         self.solution_time_end = -1.0
+        self.uav_state1_received = False
+        self.uav_state2_received = False
 
         rospy.Subscriber("inspection_problem_in", InspectionProblem, self.callbackInspectionProblem)
         rospy.Subscriber("pause_playback_in", Empty, self.callbackPausePlayback)
@@ -325,7 +328,7 @@ class MrimManager:
             self.visualizer_.setRvizConfig(rviz_config, tmp_rviz_config, self.evaluator_.inspection_problem.number_of_inspection_points,\
                                            self.mission_time_limit, self.solution_time_constraint_soft, self.solution_time_constraint_hard,\
                                            uav_names[0], uav_names[1])
-            rviz_proc = subprocess.Popen(['rviz', '-d', tmp_rviz_config], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            self.rviz_proc = subprocess.Popen(['rviz', '-d', tmp_rviz_config], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             rospy.Rate(0.2).sleep()
 
         # #} end of INITIALIZATION OF RVIZ VISUALIZER
@@ -405,13 +408,30 @@ class MrimManager:
             overall_status = False
             rospy.logerr("[MrimManager] UAV-to-obstacles distances were not checked due to missing input point cloud.")
 
+        for k in range(len(self.trajectories)):
+            if len(self.trajectories[k].poses)*self.trajectories[0].dt > self.mission_time_limit:
+                with self.diag_msg_lock:
+                    self.diag_msgs.append("-- Mission time limit exceeded! --")
+                self.mission_time_exceeded = True
+                self.evaluator_.setZeroScore()
+                overall_status = False
+                self.visualizer_.publishFullScreenMsg("------ Maximum mission time exceeded! ------\n ------ Takeoff not allowed! ------")
+
+        if not self.mission_time_exceeded: 
+            rospy.loginfo("[MrimManager] [OK] Maximum length of the trajectory.")
+        else: 
+            rospy.loginfo("[MrimManager] [FAILED] Maximum length of the trajectory.")
+
         if overall_status:
             rospy.loginfo("[MrimManager] TRAJECTORY CHECKS: {:s}".format(boolToString(overall_status)))
         else:
             rospy.logerr("[MrimManager] TRAJECTORY CHECKS: {:s}".format(boolToString(overall_status)))
 
         # start overall status publishing
-        self.overall_status = not run_type == 'uav' and (flight_always_allowed or overall_status)
+        if not run_type == 'uav':
+            self.overall_status = (flight_always_allowed or overall_status)
+        else:
+            self.overall_status = overall_status
         rospy.Timer(rospy.Duration(1), self.publishOverallStatus)
 
         # if overall_status:
@@ -469,12 +489,23 @@ class MrimManager:
                                                               self.trajectories[k].min_obst_dist.item(), self.trajectories[k].min_mutual_dist,\
                                                               self.trajectories[k].dynamics_ok)
                     self.visualizer_.publishJskMsg(jsk_msg, self.trajectories[k].overall_status, k)
+                    self.visualizer_.publishObstacles()
+                    self.visualizer_.publishSafetyArea()
+                    self.visualizer_.publishPaths(self.trajectories)
+                    self.visualizer_.publishCollisions(self.trajectories, collisions_between_uavs)
 
                 self.visualizer_.publishFullScreenMsg("------ Constraints violated! ------\n ------ Takeoff not allowed! ------")
                 rate.sleep()
 
             if overall_status or (not run_type == 'uav' and flight_always_allowed):
                 self.visualizer_.publishFullScreenMsg("")
+                # jsk_msg = self.visualizer_.generateJskMsg(self.trajectories[k].trajectory_name, self.trajectories[k].length, trajectories[k].time, \
+                #                                            0.0, 0.0, trajectories[k].dynamics_ok)
+                # self.visualizer_.publishJskMsg(jsk_msg, self.trajectories[k].overall_status, k)
+                self.visualizer_.publishObstacles()
+                self.visualizer_.publishSafetyArea()
+                self.visualizer_.publishPaths(self.trajectories)
+                self.visualizer_.publishCollisions(self.trajectories, collisions_between_uavs)
                 self.runSimulationMonitoring(self.trajectories, minimum_obstacle_distance, minimum_mutual_distance, dynamic_constraints_ok_list)
         else:
             rospy.logwarn('[MrimManager] Unexpected run type: %s', run_type)
@@ -639,7 +670,7 @@ class MrimManager:
 
             # constraints_check_successful = vel_xy_ok and vel_asc_ok and vel_desc_ok and vel_heading_ok and acc_xy_ok and acc_asc_ok and acc_desc_ok and acc_heading_ok and jerk_xy_ok and jerk_asc_ok and jerk_desc_ok and jerk_heading_ok and snap_xy_ok and snap_asc_ok and snap_desc_ok and snap_heading_ok
             translation_constraints_check_successful = vel_x_ok and vel_y_ok and vel_asc_ok and vel_desc_ok and  acc_x_ok and acc_y_ok and acc_asc_ok and acc_desc_ok 
-            constraints_check_successful = translation_constraints_check_successful and vel_heading_ok and acc_heading_ok
+            constraints_check_successful = translation_constraints_check_successful # and vel_heading_ok and acc_heading_ok
 
             if not translation_constraints_check_successful:
                 self.evaluator_.setZeroScore()
@@ -794,9 +825,11 @@ class MrimManager:
         if len(trajectories) < 2:
             return min_dists_list
 
+        max_idx = max(len(trajectories[0].poses), len(trajectories[1].poses))
+
         for t in range(len(trajectories)):
             min_dists = []
-            for k in range(len(trajectories[t].poses)):
+            for k in range(max_idx):
                 min_dist = 1e6
                 min_idx = -1
                 for t_r in range(len(trajectories)):
@@ -804,7 +837,7 @@ class MrimManager:
                         continue
 
                     idx = min(k, len(trajectories[t_r].poses) - 1)
-                    dist = getTransitionPointDist(trajectories[t].poses[k], trajectories[t_r].poses[idx])
+                    dist = getTransitionPointDist(trajectories[t].poses[min(k, len(trajectories[t].poses) -1)], trajectories[t_r].poses[idx])
                     if dist < min_dist:
                         min_dist = dist
                         min_idx = t_r
@@ -912,16 +945,22 @@ class MrimManager:
         self.visualizer_.publishSafetyArea()
         self.visualizer_.publishStartPositions()
         self.visualizer_.publishPaths(trajectories)
+        self.visualizer_.publishInspectionPoints(self.evaluator_.inspection_problem.inspection_points, self.evaluator_.viewpoints)
+        self.visualizer_.publishViewPoints(self.evaluator_.inspection_problem.inspection_points, self.evaluator_.viewpoints)
         self.visualizer_.publishFullScreenMsg("")
 
         solution_time, solution_time_penalty = self.checkMaximumSolutionTime()
         self.visualizer_.publishSolutionTime(self.solution_time_constraint_hard - solution_time, solution_time_penalty)
 
+        while not self.uav_state1_received and not self.uav_state2_received:
+            rospy.loginfo("[MrimManager] Waiting for UAV odometry states.")
+            rospy.Rate(1.0).sleep()
+
         with self.uav_states_lock:
             self.task_monitor = TaskMonitor(trajectories, self.pcl_map, self.uav_states, minimum_obstacle_distance, minimum_mutual_distance, dynamic_constraints_ok_list)
 
         # init subscriber to have goal
-        srv_start_monitoring = rospy.Service('start_monitoring_in', Trigger, self.startMonitoringCallback)
+        srv_start_monitoring = rospy.Service('start_monitoring_in', SetBool, self.startMonitoringCallback)
 
         while not self.mission_finished:
             if self.mission_started:
@@ -932,6 +971,12 @@ class MrimManager:
                 self.publishPlaybackSimulation(trajectories, poses, obst_dists, mutual_dists, min_obst_dists,\
                                                min_mutual_dists, velocities, accelerations, travelled_dists, overall_statuses,\
                                                mission_time, minimum_obstacle_distance, minimum_mutual_distance)
+            else:
+                for k in range(len(trajectories)):
+                    self.visualizer_.publishUavStatistics(k, 0.0, 0.0, 0.0, 0.0, 0.0)
+                    jsk_msg = self.visualizer_.generateJskMsg(trajectories[k].trajectory_name, trajectories[k].length, trajectories[k].time, \
+                                                               0.0, 0.0, trajectories[k].dynamics_ok)
+                    self.visualizer_.publishJskMsg(jsk_msg, trajectories[k].overall_status, k)
 
             rospy.Rate(10).sleep() #TODO: tune to avoid missing inspection point due to too fast flight through the inspection point
 
@@ -1083,12 +1128,17 @@ class MrimManager:
     # #{ startMonitoringCallback()
 
     def startMonitoringCallback(self, req):
-        if not self.mission_started:
+        if req.data:
+            if not self.mission_started:
+                self.task_monitor.start()
+
             self.mission_started = True
-            self.task_monitor.start()
-        elif not self.mission_finished:
+
+        else:
+            if not self.mission_finished:
+                self.task_monitor.stop()
+
             self.mission_finished = True
-            self.task_monitor.stop()
 
     # #} end of startMonitoringCallback()
 
@@ -1143,12 +1193,12 @@ class MrimManager:
     # #{ callbackUavStates()
 
     def callbackUavState1(self, msg):
-        self.uav_state1_subscribed = True
+        self.uav_state1_received = True
         with self.uav_states_lock:
             self.uav_states[0] = msg
 
     def callbackUavState2(self, msg):
-        self.uav_state2_subscribed = True
+        self.uav_state2_received = True
         with self.uav_states_lock:
             self.uav_states[1] = msg
 

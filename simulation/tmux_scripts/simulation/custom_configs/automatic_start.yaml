@@ -8,5 +8,6 @@ topic_check:
   topics: [
     "odometry/uav_state",
     "control_manager/diagnostics",
-    "mrim_state_machine/ready_to_takeoff"
+    "/mrim_state_machine/ready_to_takeoff_1",
+    "/mrim_state_machine/ready_to_takeoff_2"
   ]
