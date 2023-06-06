@@ -1,8 +1,8 @@
-# MRS Summer School 2022: multi-robot inspection and monitoring
+# MRS Summer School 2023: multi-robot inspection and monitoring
 
-|        | 18.04                                                                                                                                        | 20.04                                                                                                                                       | 22.04                                                                                                                                       |
-| :---   | :---:                                                                                                                                        | :---:                                                                                                                                       | :---:                                                                                                                                       |
-| Status | [![Status](https://github.com/ctu-mrs/summer-school-2022/workflows/Bionic/badge.svg)](https://github.com/ctu-mrs/summer-school-2022/actions) | [![Status](https://github.com/ctu-mrs/summer-school-2022/workflows/Focal/badge.svg)](https://github.com/ctu-mrs/summer-school-2022/actions) | [![Status](https://github.com/ctu-mrs/summer-school-2022/workflows/Jammy/badge.svg)](https://github.com/ctu-mrs/summer-school-2022/actions) |
+|        | 20.04                                                                                                                                       | 22.04                                                                                                                                       |
+| :---   | :---:                                                                                                                                       | :---:                                                                                                                                       |
+| Status | [![Status](https://github.com/ctu-mrs/summer-school-2022/workflows/Focal/badge.svg)](https://github.com/ctu-mrs/summer-school-2022/actions) | [![Status](https://github.com/ctu-mrs/summer-school-2022/workflows/Jammy/badge.svg)](https://github.com/ctu-mrs/summer-school-2022/actions) |
 
 In this Summer School task, we will focus on the cooperation of a group of two UAVs (Unmanned Aerial Vehicles) in a 3D environment with obstacles.
 The task is to plan collision-free trajectories of the UAVs so that cameras onboard the UAVs inspect a set of *N* unique inspection points.
@@ -13,7 +13,7 @@ However, this example solution has poor performance and can be improved signific
 
 ## Installation
 
-The Summer School 2022 will use the [MRS UAV System](https://github.com/ctu-mrs/mrs_uav_system) contained in a [Singularity](https://sylabs.io/singularity/) image.
+The Summer School 2023 will use the [MRS UAV System](https://github.com/ctu-mrs/mrs_uav_system) contained in a [Singularity](https://sylabs.io/singularity/) image.
 A set of scripts is provided to create a layer of abstraction above the Singularity system, so the participants only need to know how to call a shell script, e.g.,
 ```bash
 ./script.sh
@@ -24,16 +24,16 @@ No further changes are made to the host operating system.
 Requirements: Linux OS, approx. 5 GB of HDD space.
 For a non-Ubuntu OS, please, install the Singularity on your own.
 
-1) If you are a `git` veteran, you should `fork` the git repository [github.com/ctu-mrs/summer-school-2022](https://github.com/ctu-mrs/summer-school-2022). This will allow you to store changes to our code. Do not forget to make your fork private unless you want other participants to be able to peek into your code.
-__UPDATE:__ Forked repositories on github cannot be made private. Workaround: Instead of forking the repository, click the plus sign in the top right corner, select Import repository, type in the original repo address `https://github.com/ctu-mrs/summer-school-2022.git` and then the name of your new repository. In the bottom part of the form, you can select Private. 
+1) If you are a `git` veteran, you should `fork` the git repository [github.com/ctu-mrs/summer-school-2023](https://github.com/ctu-mrs/summer-school-2023). This will allow you to store changes to our code. Do not forget to make your fork private unless you want other participants to be able to peek into your code.
+__UPDATE:__ Forked repositories on github cannot be made private. Workaround: Instead of forking the repository, click the plus sign in the top right corner, select Import repository, type in the original repo address `https://github.com/ctu-mrs/summer-school-2023.git` and then the name of your new repository. In the bottom part of the form, you can select Private. 
 2) Clone the repository to `~/git`:
 ```bash
 mkdir -p ${HOME}/git
-cd ${HOME}/git && git clone https://github.com/ctu-mrs/summer-school-2022.git
+cd ${HOME}/git && git clone https://github.com/ctu-mrs/summer-school-2023.git
 ```
 3) **(on your personal computers only)** Run the installation script that will install dependencies, download the MRS singularity image containing [MRS UAV System](https://github.com/ctu-mrs/mrs_uav_system), and compile the workspace:
 ```bash
-cd ${HOME}/git/summer-school-2022 && ./install.sh
+cd ${HOME}/git/summer-school-2023 && ./install.sh
 ```
 
 ## Task overview
@@ -100,7 +100,7 @@ Good luck!
 * Sampling on a grid with a small resolution could lead to errors emerging from discretization.
 
 ### Where to code changes
-Change your code within directory `summer-school-2022/mrim_task/mrim_planner` in files:
+Change your code within directory `summer-school-2023/mrim_task/mrim_planner` in files:
 
   * `scripts/`
     * `planner.py`: Crossroad script where the path to your solution begins. Here you will find initial ideas and examples on how to load parameters.
@@ -171,7 +171,7 @@ Stopping the simulation is done by calling
 By default, the `run_simulation.sh` spawns you 2 UAVs in the `single_tower` world.
 To change the world to `four_towers`, you have to
 
-1. change the parameter `problem/name` in the `mrim_task/mrim_planner/config/virtual.yaml` to one of the `four_towers` problems (see section [Testing](https://github.com/ctu-mrs/summer-school-2022#testing)) and
+1. change the parameter `problem/name` in the `mrim_task/mrim_planner/config/virtual.yaml` to one of the `four_towers` problems (see section [Testing](https://github.com/ctu-mrs/summer-school-2023#testing)) and
 2. change variable `PROBLEM` in `simulation/tmux_scripts/simulation/session.yml` from `export PROBLEM=single_tower` to `export PROBLEM=four_towers`.
 
 You may notice that your terminal opened multiple tabs.
@@ -283,7 +283,7 @@ Feel free to ask during the summer school and especially during the seminars how
 
 If there is an update in the repository, you can pull it to your local machine using git:
 ```
-cd ${HOME}/git/summer-school-2022 && git pull
+cd ${HOME}/git/summer-school-2023 && git pull
 ```
 
 **Google**
@@ -303,7 +303,7 @@ We will try to help you as soon as possible.
 
 ## DISCLAIMER
 
-During the week of the 2022 MRS Summer School, the organizers reserve the right to:
+During the week of the 2023 MRS Summer School, the organizers reserve the right to:
 
   * to do fixes: to update the task in case of finding severe bugs in the code,
   * to maintain fairness: to change the problems or the constraints for the challenges,
