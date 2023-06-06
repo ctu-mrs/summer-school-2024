@@ -133,7 +133,7 @@ fi
 
 # source the user_workspace, if it exists
 [ -e ~/user_ros_workspace/devel/setup.bash ] && source ~/user_ros_workspace/devel/setup.bash
-[ -e ~/summer-school-2022/simulation/user_ros_workspace/devel/setup.bash ] && source ~/summer-school-2022/simulation/user_ros_workspace/devel/setup.bash
+[ -e ~/summer-school-2023/simulation/user_ros_workspace/devel/setup.bash ] && source ~/summer-school-2023/simulation/user_ros_workspace/devel/setup.bash
 
 [ -z "$ROS_PORT" ] && export ROS_PORT=11311
 [ -z "$ROS_MASTER_URI" ] && export ROS_MASTER_URI=http://localhost:$ROS_PORT
@@ -158,7 +158,7 @@ export WORLD_NAME="simulation" # e.g.: "simulation" <= mrs_general/config/world_
 export MRS_STATUS="readme" # {readme, dynamics, balloon, avoidance, control_error, gripper}
 export LOGGER_DEBUG="false" # sets the ros console output level to debug
 
-export ROS_WORKSPACES="$ROS_WORKSPACES /opt/mrs/mrs_workspace ~/summer-school-2022/simulation/user_ros_workspace"
+export ROS_WORKSPACES="$ROS_WORKSPACES /opt/mrs/mrs_workspace ~/summer-school-2023/simulation/user_ros_workspace"
 
 # source uav_core from within the container
 source /opt/mrs/mrs_workspace/src/uav_core/miscellaneous/shell_additions/shell_additions.sh
