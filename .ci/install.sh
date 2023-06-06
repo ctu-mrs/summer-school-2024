@@ -13,8 +13,8 @@ echo ""
 cd
 mkdir git
 cd git
-ln -s $GITHUB_WORKSPACE summer-school-2022
-cd summer-school-2022
+ln -s $GITHUB_WORKSPACE summer-school-2023
+cd summer-school-2023
 echo "running the main install.sh"
 ./install.sh
 
