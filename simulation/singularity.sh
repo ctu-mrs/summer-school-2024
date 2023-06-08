@@ -40,7 +40,7 @@ WRITABLE=false # true: will run it as --writable (works with --sandbox container
 MOUNTS=(
   # mount the custom user workspace into the container
   #                  HOST PATH          CONTAINER PATH
-  "type=bind" "$MRS_SINGULARITY_PATH/.." "/home/$USER/summer-school-2022"
+  "type=bind" "$MRS_SINGULARITY_PATH/.." "/home/$USER/summer-school-2023"
 
   # mount the MRS shell additions into the container, DO NOT MODIFY
   "type=bind" "$MOUNT_PATH" "/opt/mrs/host"
