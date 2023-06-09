@@ -41,7 +41,7 @@ cd ${HOME}/git/summer-school-2023 && ./install.sh
 You are given two UAVs (Red 🟥 and Blue 🟦) required to inspect a set of **inspections points (IPs)** as fast as possible in a 3D environment with obstacles.
 The two UAVs are equipped with the [MRS control pipeline](https://github.com/ctu-mrs/uav_core) [1], allowing precise trajectory tracking.
 Your task is to assign the IPs to the UAVs and to generate multi-goal paths visiting **viewpoints (VPs)** (poses in which the particular IPs are inspected with on-board cameras) of each IP while keeping a safe distance from the obstacles and between the two UAVs.
-Furthermore, you shall convert paths to collision-free time-parametrized trajectories that respect the UAVs' dynamic constraints.
+Furthermore, you shall convert paths to collision-free time-parametrized trajectories that respect the UAVs' dynamic [constraints](#constraints).
 The IPs are defined by their position and inspection angle and are divided into three subsets:
 
 1. 🔴 red locations: inspectable by 🟥 UAV only,
@@ -85,6 +85,33 @@ Please go through the code and its inline comments to give you a better idea abo
   8. Postprocess the time-parametrized trajectories to resolve collisions. Start by improving the implemented collision avoidance, e.g., by delaying trajectory start till there is no collision. Tip: try the methods available for you in the config file (see below).
   9. Effectively redistribute IPs to avoid collisions and to achieve lower inspection time.
 
+  **Things to avoid:**
+
+  * Too high minimum distance from obstacles could lead to path planners failing to find a path to some locations.
+  * Smoothing and shortening the path in locations of inspections could lead to missing the inspection point.
+  * Sampling on a grid with a small resolution could lead to errors emerging from discretization.
+
+### Constraints
+
+Your solution to both the challenges has to conform to constraints summarized in the following table:
+
+| Constraint                                          | Virtual challenge | Real-world challenge |
+| :---                                                | :---:             | :---:                |
+| Maximum solution time (soft) - $T_s$:               | 40 s              | 30 s                 |
+| Maximum solution time (hard):                       | 120 s             | 60 s                 |
+| Maximum mission time:                               | 200 s             | 240 s                |
+| Maximum velocity per x and y axes:                  | 2 m/s             | 1 m/s                |
+| Maximum velocity in z axis:                         | 1 m/s             | 0.5 m/s              |
+| Maximum acceleration per x and y axes:              | 2 m/s^2           | 1 m/s^2              |
+| Maximum acceleration in z axis:                     | 1 m/s^2           | 0.5 m/s^2            |
+| Maximum heading rate:                               | 0.5 rad/s         | 0.5 rad/s            |
+| Maximum heading acceleration:                       | 1 rad/s^2         | 1 rad/s^2            |
+| Minimum obstacle distance:                          | 1.5 m             | 2.0 m                |
+| Minimum mutual distance:                            | 2.0 m             | 3.0 m                |
+| Dist. from starting position to stop the mission:\* | 1.0 m             | 1.0 m                |
+
+\* The last point of the trajectory is expected to match the starting point with up to 1 m tolerance.
+
 Note that the task in its generality is very complex to be solved in a limited time during several days.
 You are not expected to solve every subproblem so do not feel bad if you don't.
 Instead, try to exploit and improve the parts of the solution you are most interested in or think to improve the solution the most.
@@ -93,13 +120,9 @@ We limit your computational time to speed up the flow of the competition.
 Although we prepared a skeleton solution as a baseline, **feel free to design your algorithms to improve the overall performance**.
 Good luck!
 
-**Things to avoid:**
-
-* Too high minimum distance from obstacles could lead to path planners failing to find a path to some locations.
-* Smoothing and shortening the path in locations of inspections could lead to missing the inspection point.
-* Sampling on a grid with a small resolution could lead to errors emerging from discretization.
 
 ### Where to code changes
+---
 Change your code within directory `summer-school-2023/mrim_task/mrim_planner` in files:
 
   * `scripts/`
@@ -157,6 +180,7 @@ The RViz window contains:
   * overall trajectories information in the top left/right corners (background is green if every check is OK, red otherwise)
   * current flight statistics right below
   * information about the mission and the score centered in the top
+  * lines intersecting both paths which indicate collisions.
 
 **2) Online: run simulation locally**
 
@@ -252,24 +276,6 @@ No changes are required on your side.
 However, note that the evaluation of inspected points will be based on the actual pose of the UAV in the world, not the reference trajectories.
 Hence, the effect of trajectory tracking will not be negligible, and you should consider the challenges of the real-world environment.
 Consider the challenges during parametrization and prepare your solution for deviations from the ideal conditions. E.g., introduce reserves for UAV-to-UAV and UAV-to-obstacles distances to prevent unfortunate zeroing of your score or lower the magnitude of allowed deviations from the reference trajectory.
-Your solution to both the challenges has to conform to constraints summarized in the following table:
-
-| Constraint                                          | Virtual challenge | Real-world challenge |
-| :---                                                | :---:             | :---:                |
-| Maximum solution time (soft):                       | 40 s              | 30 s                 |
-| Maximum solution time (hard):                       | 120 s             | 60 s                 |
-| Maximum mission time:                               | 200 s             | 240 s                |
-| Maximum velocity per x and y axes:                  | 2 m/s             | 1 m/s                |
-| Maximum velocity in z axis:                         | 1 m/s             | 0.5 m/s              |
-| Maximum acceleration per x and y axes:              | 2 m/s^2           | 1 m/s^2              |
-| Maximum acceleration in z axis:                     | 1 m/s^2           | 0.5 m/s^2            |
-| Maximum heading rate:                               | 0.5 rad/s         | 0.5 rad/s            |
-| Maximum heading acceleration:                       | 1 rad/s^2         | 1 rad/s^2            |
-| Minimum obstacle distance:                          | 1.5 m             | 2.0 m                |
-| Minimum mutual distance:                            | 2.0 m             | 3.0 m                |
-| Dist. from starting position to stop the mission:\* | 1.0 m             | 1.0 m                |
-
-\* The last point of the trajectory is expected to match the starting point with up to 1 m tolerance.
 
 ## Explore another possible usage of the MRS UAV System
 
