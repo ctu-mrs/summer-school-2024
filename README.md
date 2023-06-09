@@ -24,14 +24,16 @@ No further changes are made to the host operating system.
 Requirements: Linux OS, approx. 5 GB of HDD space.
 For a non-Ubuntu OS, please, install the Singularity on your own.
 
-1) If you are a `git` veteran, you should `fork` the git repository [github.com/ctu-mrs/summer-school-2023](https://github.com/ctu-mrs/summer-school-2023). This will allow you to store changes to our code. Do not forget to make your fork private unless you want other participants to be able to peek into your code.
-__UPDATE:__ Forked repositories on github cannot be made private. Workaround: Instead of forking the repository, click the plus sign in the top right corner, select Import repository, type in the original repo address `https://github.com/ctu-mrs/summer-school-2023.git` and then the name of your new repository. In the bottom part of the form, you can select Private. 
-2) Clone the repository to `~/git`:
+1. If you are a `git` veteran, you should `fork` the git repository [github.com/ctu-mrs/summer-school-2023](https://github.com/ctu-mrs/summer-school-2023). This will allow you to store changes to our code. Do not forget to make your fork private unless you want other participants to be able to peek into your code.
+**UPDATE:** Forked repositories on github cannot be made private. Workaround: Instead of forking the repository, click the plus sign in the top right corner, select Import repository, type in the original repo address `https://github.com/ctu-mrs/summer-school-2023.git` and then the name of your new repository. In the bottom part of the form, you can select Private. 
+
+2. Clone the repository to `~/git`:
 ```bash
 mkdir -p ${HOME}/git
 cd ${HOME}/git && git clone https://github.com/ctu-mrs/summer-school-2023.git
 ```
-3) **(on your personal computers only)** Run the installation script that will install dependencies, download the MRS singularity image containing [MRS UAV System](https://github.com/ctu-mrs/mrs_uav_system), and compile the workspace:
+
+3. **(on your personal computers only)** Run the installation script that will install dependencies, download the MRS singularity image containing [MRS UAV System](https://github.com/ctu-mrs/mrs_uav_system), and compile the workspace:
 ```bash
 cd ${HOME}/git/summer-school-2023 && ./install.sh
 ```
@@ -62,12 +64,12 @@ The motion blur effect during imaging is neglected; thus, the UAVs are not requi
 
 There is a low-performance solution available at your hands.
 This solution consists of:
-  * non-controlled heading of the UAVs,
-  * random assignment of IPs in 🟣 to UAVs,
-  * computation of TSP (Traveling Salesman Problem) tours using Euclidean distance estimates,
-  * planning paths with the use of badly parametrized RRT planner,
-  * generation of trajectories with required zero velocity at the end of each straight segment,
-  * collision avoidance is disabled.
+* non-controlled heading of the UAVs,
+* random assignment of IPs in 🟣 to UAVs,
+* computation of TSP (Traveling Salesman Problem) tours using Euclidean distance estimates,
+* planning paths with the use of badly parametrized RRT planner,
+* generation of trajectories with required zero velocity at the end of each straight segment,
+* collision avoidance is disabled.
 
 The solution produced by this approach has very poor performance and does not score any points, yet provides large space for improvement.
 To improve the solution, you can follow the steps suggested below or find your way to improve the solution.
@@ -87,9 +89,9 @@ Please go through the code and its inline comments to give you a better idea abo
 
   **Things to avoid:**
 
-  * Too high minimum distance from obstacles could lead to path planners failing to find a path to some locations.
-  * Smoothing and shortening the path in locations of inspections could lead to missing the inspection point.
-  * Sampling on a grid with a small resolution could lead to errors emerging from discretization.
+* Too high minimum distance from obstacles could lead to path planners failing to find a path to some locations.
+* Smoothing and shortening the path in locations of inspections could lead to missing the inspection point.
+* Sampling on a grid with a small resolution could lead to errors emerging from discretization.
 
 Note that the task in its generality is very complex to be solved in a limited time during several days.
 You are not expected to solve every subproblem so do not feel bad if you don't.
@@ -120,17 +122,15 @@ Your solution to both the challenges has to conform to constraints summarized in
 
 \* The last point of the trajectory is expected to match the starting point with up to 1 m tolerance.
 
+## Where to code changes
 
-
-### Where to code changes
----
 Change your code within directory `summer-school-2023/mrim_task/mrim_planner` in files:
 
-  * `scripts/`
-    * `planner.py`: Crossroad script where the path to your solution begins. Here you will find initial ideas and examples on how to load parameters.
-    * `trajectory.py`: Contains functionalities for basic work with trajectories. Here, you can **interpolate heading** between the path waypoints and experiment with smoothing the paths, sampling the trajectories, computing collisions between points/paths/trajectories, or postprocessing trajectories to prevent collisions.
-    * `solvers/`
-      * `tsp_solvers.py`: This is where VPs assignment for TSP, path planning, and solving TSP happens. Here you can play with an efficient assignment of VPs to UAVs or study the effect of path planners on TSP solution performance.
+* `scripts/`
+  * `planner.py`: Crossroad script where the path to your solution begins. Here you will find initial ideas and examples on how to load parameters.
+  * `trajectory.py`: Contains functionalities for basic work with trajectories. Here, you can **interpolate heading** between the path waypoints and experiment with smoothing the paths, sampling the trajectories, computing collisions between points/paths/trajectories, or postprocessing trajectories to prevent collisions.
+  * `solvers/`
+    * `tsp_solvers.py`: This is where VPs assignment for TSP, path planning, and solving TSP happens. Here you can play with an efficient assignment of VPs to UAVs or study the effect of path planners on TSP solution performance.
     * `utils.py`: Default source of various utility functions. Feel free to add your own.
   * `config/`
     * `virtual.yaml` and `real_world.yaml`: Config files (for two challenges described below) containing various parameters/switches for the task. If you need other parameters, add them here, load them in `scripts/planner.py` and use them in the code accordingly.
@@ -146,8 +146,7 @@ Check `mrim_planner/scripts/data_types.py` to see what the classes do.
 Apart from the configs in `mrim_planner/config`, default configs for the mission are loaded from `mrim_manager/config` for each run type.
 Take a look here to see the trajectories' dynamic constraints or safety limits.
 
-### Run your code
----
+## Run your code
 
 A set of scripts is provided in `simulation/`, allowing you to start and stop the simulation and evaluate your code.
 The **bold** scripts are expected to be used directly by the user.
