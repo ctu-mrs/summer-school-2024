@@ -37,7 +37,6 @@ cd ${HOME}/git/summer-school-2023 && ./install.sh
 ```
 
 ## Task overview
----
 
 You are given two UAVs (Red 🟥 and Blue 🟦) required to inspect a set of **inspections points (IPs)** as fast as possible in a 3D environment with obstacles.
 The two UAVs are equipped with the [MRS control pipeline](https://github.com/ctu-mrs/uav_core) [1], allowing precise trajectory tracking.
@@ -60,7 +59,6 @@ The mission starts when the trajectories following is started and ends once the 
 The motion blur effect during imaging is neglected; thus, the UAVs are not required to stop at particular VPs.
 
 ## Task assignment
----
 
 There is a low-performance solution available at your hands.
 This solution consists of:
@@ -75,7 +73,7 @@ The solution produced by this approach has very poor performance and does not sc
 To improve the solution, you can follow the steps suggested below or find your way to improve the solution.
 Please go through the code and its inline comments to give you a better idea about individual tips.
 
-**Tips for improving the solution:**
+  **Tips for improving the solution:**
 
   1. Interpolate the heading between the samples. This is the first thing to solve if you want to score!
   2. Test different methods available for estimating the distance between the VPs and for planning collision-free paths connecting the VPs [available planners: A*, RRT (default), RRT*].
@@ -92,6 +90,14 @@ Please go through the code and its inline comments to give you a better idea abo
   * Too high minimum distance from obstacles could lead to path planners failing to find a path to some locations.
   * Smoothing and shortening the path in locations of inspections could lead to missing the inspection point.
   * Sampling on a grid with a small resolution could lead to errors emerging from discretization.
+
+Note that the task in its generality is very complex to be solved in a limited time during several days.
+You are not expected to solve every subproblem so do not feel bad if you don't.
+Instead, try to exploit and improve the parts of the solution you are most interested in or think to improve the solution the most.
+While designing your solution, do not forget to consider maximum computational time.
+We limit your computational time to speed up the flow of the competition.
+Although we prepared a skeleton solution as a baseline, **feel free to design your algorithms to improve the overall performance**.
+Good luck!
 
 ### Constraints
 
@@ -114,13 +120,6 @@ Your solution to both the challenges has to conform to constraints summarized in
 
 \* The last point of the trajectory is expected to match the starting point with up to 1 m tolerance.
 
-Note that the task in its generality is very complex to be solved in a limited time during several days.
-You are not expected to solve every subproblem so do not feel bad if you don't.
-Instead, try to exploit and improve the parts of the solution you are most interested in or think to improve the solution the most.
-While designing your solution, do not forget to consider maximum computational time.
-We limit your computational time to speed up the flow of the competition.
-Although we prepared a skeleton solution as a baseline, **feel free to design your algorithms to improve the overall performance**.
-Good luck!
 
 
 ### Where to code changes
@@ -227,7 +226,6 @@ You are required only to provide functional code for trajectory planning contain
 If you created other ROS nodes, which shall be run separately to the `mrim_planner`, include their launching in `mrim_planner/launch/planner.launch`.
 
 ## Problem sets
----
 
 You have three problems prepared for testing and evaluating your solution.
 The problems are located in `mrim_resources/problems`: you can switch between them by changing the `problem/name` line in `mrim_planner/config/virtual.yaml` to:
@@ -237,7 +235,6 @@ The problems are located in `mrim_resources/problems`: you can switch between th
   3. `four_towers_large.problem` is a complex problem with more than 30 IPs that will test your solution in full (**a similar problem will be used in the virtual competition** described below)
 
 ## Competition
----
 
 There will be two competitions:
 
@@ -288,7 +285,7 @@ Based on the presentation of the MRS system, you can also try other capabilities
 You selected a group of practicals based on your scientific interest.
 Feel free to ask during the summer school and especially during the seminars how the system can be used for your area of interest.
 
-## TROUBLESHOOTING
+## Troubleshooting
 
 **Updating the repository**
 
@@ -312,7 +309,7 @@ If you find a bug in the task, you need assistance, or you have any other questi
 
 We will try to help you as soon as possible.
 
-## DISCLAIMER
+## Disclaimer
 
 During the week of the 2023 MRS Summer School, the organizers reserve the right to:
 
@@ -320,7 +317,7 @@ During the week of the 2023 MRS Summer School, the organizers reserve the right 
   * to maintain fairness: to change the problems or the constraints for the challenges,
   * to preserve safety: to discard provided trajectories for the real-world challenge if the flight would be unsafe in any possible way.
 
-## REFERENCES
+## References
 
 * [1]  Baca, T., Petrlik, M., Vrba, M., Spurny, V., Penicka, R., Hert, D., and Saska, M., [The MRS UAV System: Pushing the Frontiers of Reproducible Research, Real-world Deployment, and Education with Autonomous Unmanned Aerial Vehicles](https://arxiv.org/pdf/2008.08050), _Journal of Intelligent & Robotic Systems 102(26):1–28, May 2021_, GitHub: https://github.com/ctu-mrs/mrs_uav_system.
 * [2]  H. Pham, Q. C. Pham, [A New Approach to Time-Optimal Path Parameterization Based on Reachability Analysis](https://www.researchgate.net/publication/318671280_A_New_Approach_to_Time-Optimal_Path_Parameterization_Based_on_Reachability_Analysis), [Documentation](https://hungpham2511.github.io/toppra/index.html)
