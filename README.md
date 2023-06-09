@@ -37,6 +37,7 @@ cd ${HOME}/git/summer-school-2023 && ./install.sh
 ```
 
 ## Task overview
+---
 
 You are given two UAVs (Red 🟥 and Blue 🟦) required to inspect a set of **inspections points (IPs)** as fast as possible in a 3D environment with obstacles.
 The two UAVs are equipped with the [MRS control pipeline](https://github.com/ctu-mrs/uav_core) [1], allowing precise trajectory tracking.
@@ -59,6 +60,7 @@ The mission starts when the trajectories following is started and ends once the 
 The motion blur effect during imaging is neglected; thus, the UAVs are not required to stop at particular VPs.
 
 ## Task assignment
+---
 
 There is a low-performance solution available at your hands.
 This solution consists of:
@@ -97,17 +99,17 @@ Your solution to both the challenges has to conform to constraints summarized in
 
 | Constraint                                          | Virtual challenge | Real-world challenge |
 | :---                                                | :---:             | :---:                |
-| Maximum solution time (soft) - $T_s$:               | 40 s              | 30 s                 |
-| Maximum solution time (hard):                       | 120 s             | 60 s                 |
-| Maximum mission time:                               | 200 s             | 240 s                |
-| Maximum velocity per x and y axes:                  | 2 m/s             | 1 m/s                |
-| Maximum velocity in z axis:                         | 1 m/s             | 0.5 m/s              |
-| Maximum acceleration per x and y axes:              | 2 m/s^2           | 1 m/s^2              |
-| Maximum acceleration in z axis:                     | 1 m/s^2           | 0.5 m/s^2            |
-| Maximum heading rate:                               | 0.5 rad/s         | 0.5 rad/s            |
-| Maximum heading acceleration:                       | 1 rad/s^2         | 1 rad/s^2            |
-| Minimum obstacle distance:                          | 1.5 m             | 2.0 m                |
-| Minimum mutual distance:                            | 2.0 m             | 3.0 m                |
+| Maximum solution time (soft) - $T_s$                | 40 s              | 30 s                 |
+| Maximum solution time (hard)                        | 120 s             | 60 s                 |
+| Maximum mission time                                | 200 s             | 240 s                |
+| Maximum velocity per x and y axes                   | 2 m/s             | 1 m/s                |
+| Maximum velocity in z axis                          | 1 m/s             | 0.5 m/s              |
+| Maximum acceleration per x and y axes               | 2 m/s^2           | 1 m/s^2              |
+| Maximum acceleration in z axis                      | 1 m/s^2           | 0.5 m/s^2            |
+| Maximum heading rate                                | 0.5 rad/s         | 0.5 rad/s            |
+| Maximum heading acceleration                        | 1 rad/s^2         | 1 rad/s^2            |
+| Minimum obstacle distance                           | 1.5 m             | 2.0 m                |
+| Minimum mutual distance                             | 2.0 m             | 3.0 m                |
 | Dist. from starting position to stop the mission:\* | 1.0 m             | 1.0 m                |
 
 \* The last point of the trajectory is expected to match the starting point with up to 1 m tolerance.
@@ -146,6 +148,7 @@ Apart from the configs in `mrim_planner/config`, default configs for the mission
 Take a look here to see the trajectories' dynamic constraints or safety limits.
 
 ### Run your code
+---
 
 A set of scripts is provided in `simulation/`, allowing you to start and stop the simulation and evaluate your code.
 The **bold** scripts are expected to be used directly by the user.
@@ -223,7 +226,8 @@ The preparation for a real-world experiment does not require any actions on your
 You are required only to provide functional code for trajectory planning contained in the `mrim_planner`.
 If you created other ROS nodes, which shall be run separately to the `mrim_planner`, include their launching in `mrim_planner/launch/planner.launch`.
 
-## Testing
+## Problem sets
+---
 
 You have three problems prepared for testing and evaluating your solution.
 The problems are located in `mrim_resources/problems`: you can switch between them by changing the `problem/name` line in `mrim_planner/config/virtual.yaml` to:
@@ -233,6 +237,7 @@ The problems are located in `mrim_resources/problems`: you can switch between th
   3. `four_towers_large.problem` is a complex problem with more than 30 IPs that will test your solution in full (**a similar problem will be used in the virtual competition** described below)
 
 ## Competition
+---
 
 There will be two competitions:
 
@@ -255,7 +260,7 @@ The results will be presented during an awards ceremony organized at the experim
 
 **Reasons to assign zero score (and thus to disqualify the solution):**
 
-  1. violation of assigned dynamic constraints of UAVs (**in horizontal and vertical directions only**; violation of constraints on heading does not affect the score but beware that the heading rate/acceleration of the UAV controller will be limited by these constraints),
+  1. violation of assigned dynamic [constraints](#constraints) of UAVs (**in horizontal and vertical directions only**; violation of constraints on heading does not affect the score but beware that the heading rate/acceleration of the UAV controller will be limited by these constraints),
   2. violation of minimum allowed distance between obstacles and UAVs,
   3. violation of minimum allowed mutual distance between UAVs,
   4. violation of maximum distance of final trajectory point to the predefined starting location,
@@ -266,7 +271,7 @@ In case of a tie, **secondary key** to determine the final order of the particip
 ### Virtual
 
 The dimensions of the virtual environment and inspection problem will be similar to `four_towers_large.problem`.
-Your solution for the virtual environment has to conform to constraints summarized in the table below.
+Your solution for the virtual environment has to conform to constraints summarized in the table [above](#constraints).
 
 ### Real-world
 
