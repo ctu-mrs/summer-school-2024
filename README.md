@@ -241,7 +241,7 @@ There will be two competitions:
   2. in the real world.
 
 To participate in the competitions, you must send your solution in a single archive file by email until Thursday at 11:59 p.m.
-Please, **email us** the code to `tomas.baca@fel.cvut.cz` with the subject **SUMMER SCHOOL TASK** till Thursday 11:59 p.m., zipped with your *Team's name* as:
+Please, **email us** the code to `guptapar@fel.cvut.cz` with the subject **SUMMER SCHOOL TASK** till Thursday 11:59 p.m., zipped with your *Team's name* as:
 ```bash
 zip -r my_team_name.zip mrim_planner
 ```
@@ -302,9 +302,8 @@ Sometimes just writing the question down helps you to understand the problem.
 
 If you find a bug in the task, you need assistance, or you have any other questions, please contact by email one of (or all of):
 
-  * Pavel Petracek `petrapa6@fel.cvut.cz`
-  * Vit Kratky `kratkvit@fel.cvut.cz`
-  * Tomas Baca `tomas.baca@fel.cvut.cz`
+* Parakh M. Gupta `guptapar@fel.cvut.cz`
+* Filip Novák `novakfi8@fel.cvut.cz`
 
 We will try to help you as soon as possible.
 
@@ -312,9 +311,9 @@ We will try to help you as soon as possible.
 
 During the week of the 2023 MRS Summer School, the organizers reserve the right to:
 
-  * to do fixes: to update the task in case of finding severe bugs in the code,
-  * to maintain fairness: to change the problems or the constraints for the challenges,
-  * to preserve safety: to discard provided trajectories for the real-world challenge if the flight would be unsafe in any possible way.
+* to do fixes: to update the task in case of finding severe bugs in the code,
+* to maintain fairness: to change the problems or the constraints for the challenges,
+* to preserve safety: to discard provided trajectories for the real-world challenge if the flight would be unsafe in any possible way.
 
 ## References
 
