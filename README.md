@@ -256,7 +256,7 @@ The results will be presented during an awards ceremony organized at the experim
 
 **Reasons to assign zero score (and thus to disqualify the solution):**
 
-  1. violation of assigned dynamic [constraints](#constraints) of UAVs (**in horizontal and vertical directions only**; violation of constraints on heading does not affect the score but beware that the heading rate/acceleration of the UAV controller will be limited by these constraints),
+  1. violation of assigned dynamic constraints of UAVs (**in horizontal and vertical directions only**; violation of constraints on heading does not affect the score but beware that the heading rate/acceleration of the UAV controller will be limited by these constraints),
   2. violation of minimum allowed distance between obstacles and UAVs,
   3. violation of minimum allowed mutual distance between UAVs,
   4. violation of maximum distance of final trajectory point to the predefined starting location,
@@ -267,7 +267,7 @@ In case of a tie, **secondary key** to determine the finishing order of the part
 ### Virtual
 
 The dimensions of the virtual environment and inspection problem will be similar to `four_towers_large.problem`.
-Your solution for the virtual environment has to conform to constraints summarized in the table [above](#constraints).
+Your solution for the virtual environment has to conform to constraints summarized in the table above.
 
 ### Real-world
 
