@@ -260,9 +260,9 @@ The results will be presented during an awards ceremony organized at the experim
   2. violation of minimum allowed distance between obstacles and UAVs,
   3. violation of minimum allowed mutual distance between UAVs,
   4. violation of maximum distance of final trajectory point to the predefined starting location,
-  5. exceeding the hard maximum available time for computing a solution (see the table below).
+  5. exceeding the hard maximum available time for computing a solution (see the [constraints](#constraints) table).
 
-In case of a tie, **secondary key** to determine the final order of the participating teams is given as $T_I + T_P$ (in seconds), where $T_I$ is the inspection time (start to end of both trajectories) and $T_P = max(0, T_C - T_s)$ is the time $T_C$ it took to compute the solution minus the the soft limit $T_s$ for computing the solution (see table below).
+In case of a tie, **secondary key** to determine the finishing order of the participating teams is given as $T_I + T_P$ (in seconds), where $T_I$ is the inspection time (start to end of both trajectories) and $T_P = max(0, T_C - T_s)$ is the time $T_C$ it took to compute the solution minus the the soft limit $T_s$ for computing the solution (see the [constraints](#constraints) table).
 
 ### Virtual
 
