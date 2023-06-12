@@ -7,7 +7,7 @@ import math
 import dubins
 
 from utils import segmentPointDist, distEuclidean, lineSphereIntersections, simulateStep, wrapAngle, angleDiff
-from data_types import Pose
+from data_types import Pose, Viewpoint
 import numpy as np
 
 import toppra as ta
@@ -147,7 +147,7 @@ class TrajectoryUtils():
 
     # # #{ interpolateHeading()
 
-    def interpolateHeading(self, waypoints):
+    def interpolateHeading(self, waypoints:Viewpoint):
         '''
         Interpolates linearly the UAV heading between waypoints.
 
@@ -184,6 +184,7 @@ class TrajectoryUtils():
 
             # get initial heading and subtraj length
             hdg_from    = wrapAngle(g_from.heading)
+            current_heading = hdg_from
             subtraj_len = self.getLength(subtraj)
 
             ## | ----------------------- Interpolate ---------------------- |
