@@ -6,4 +6,5 @@ MY_PATH=`( cd "$MY_PATH" && pwd )`
 cd $MY_PATH
 
 cd images
+rm *.sif
 wget -c https://nasmrs.felk.cvut.cz/index.php/s/gLr91iWRgfSgn7I/download -O mrs_uav_system.sif --no-check-certificate
