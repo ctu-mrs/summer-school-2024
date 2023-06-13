@@ -1,7 +1,7 @@
 name: simulation
 root: ./
 startup_window: planner
-pre_window: export PROBLEM=virtual_competition; export UAV_NAME=uav1; export RUN_TYPE=simulation; export UAV_TYPE=f450; export WORLD_FILE='$(find mrim_resources)'/worlds/${PROBLEM}.yaml; export SENSORS="garmin_down"
+pre_window: export PROBLEM=single_tower; export UAV_NAME=uav1; export RUN_TYPE=simulation; export UAV_TYPE=f450; export WORLD_FILE='$(find mrim_resources)'/worlds/${PROBLEM}.yaml; export SENSORS="garmin_down"; export GUI=false
 windows:
   - roscore:
       layout: tiled
@@ -10,7 +10,7 @@ windows:
   - gazebo:
       layout: tiled
       panes:
-        - waitForRos; roslaunch mrs_simulation simulation.launch world_name:=grass_plane world_file:='$(find mrim_resources)/gazebo_files/worlds/$(env PROBLEM).world' gui:=false
+        - waitForRos; roslaunch mrs_simulation simulation.launch world_name:=grass_plane world_file:='$(find mrim_resources)/gazebo_files/worlds/$(env PROBLEM).world' gui:=$GUI
   - status:
       layout: tiled
       panes:

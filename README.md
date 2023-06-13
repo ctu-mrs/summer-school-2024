@@ -199,7 +199,8 @@ To change the world to `four_towers`, you have to
 
   * change the parameter `problem/name` in the `mrim_task/mrim_planner/config/virtual.yaml` to one of the `four_towers` problems (see section [Testing](https://github.com/ctu-mrs/summer-school-2023#testing)) and
   * change variable `PROBLEM` in `simulation/tmux_scripts/simulation/session.yml` from `export PROBLEM=single_tower` to `export PROBLEM=four_towers`.
-* **Gazebo GUI:** The GUI of Gazebo simulator is disabled by default to not stress-out your system. You can enable it by changing the variable `GUI` in `simulation/tmux_scripts/simulation/session.yml` from to `export GUI=false` to `export GUI=true`.
+* **Gazebo GUI:** The GUI of Gazebo simulator is disabled by default to not stress-out your system. You can enable it by changing the variable `GUI` in `simulation/tmux_scripts/simulation/session.yml` from `export GUI=false` to `export GUI=true`.
+
 You may notice that your terminal opened multiple tabs.
 Check the first page of the [MRS Cheatsheet](https://github.com/ctu-mrs/mrs_cheatsheet) if you need help navigating the tabs and panes.
 
