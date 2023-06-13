@@ -177,11 +177,11 @@ The RViz (ROS visualization) shows an **example solution** to the task.
 
 The RViz window contains:
 
-  * start/pause button in the left bottom corner
-  * overall trajectories information in the top left/right corners (background is green if every check is OK, red otherwise)
-  * current flight statistics right below
-  * information about the mission and the score centered in the top
-  * lines intersecting both paths which indicate collisions.
+* start/pause button in the left bottom corner
+* overall trajectories information in the top left/right corners (background is green if every check is OK, red otherwise)
+* current flight statistics right below
+* information about the mission and the score centered in the top
+* lines intersecting both paths which indicate collisions.
 
 **2) Online: run simulation locally**
 
@@ -193,12 +193,13 @@ Stopping the simulation is done by calling
 ```bash
 ./simulation/kill_simulation.sh
 ```
-By default, the `run_simulation.sh` spawns you 2 UAVs in the `single_tower` world.
+**Things to configure/change :**
+* **Problem Type:** By default, the `run_simulation.sh` spawns you 2 UAVs in the `single_tower` world.
 To change the world to `four_towers`, you have to
 
-1. change the parameter `problem/name` in the `mrim_task/mrim_planner/config/virtual.yaml` to one of the `four_towers` problems (see section [Testing](https://github.com/ctu-mrs/summer-school-2023#testing)) and
-2. change variable `PROBLEM` in `simulation/tmux_scripts/simulation/session.yml` from `export PROBLEM=single_tower` to `export PROBLEM=four_towers`.
-
+  * change the parameter `problem/name` in the `mrim_task/mrim_planner/config/virtual.yaml` to one of the `four_towers` problems (see section [Testing](https://github.com/ctu-mrs/summer-school-2023#testing)) and
+  * change variable `PROBLEM` in `simulation/tmux_scripts/simulation/session.yml` from `export PROBLEM=single_tower` to `export PROBLEM=four_towers`.
+* **Gazebo GUI:** The GUI of Gazebo simulator is disabled by default to not stress-out your system. You can enable it by changing the variable `GUI` in `simulation/tmux_scripts/simulation/session.yml` from to `export GUI=false` to `export GUI=true`.
 You may notice that your terminal opened multiple tabs.
 Check the first page of the [MRS Cheatsheet](https://github.com/ctu-mrs/mrs_cheatsheet) if you need help navigating the tabs and panes.
 
