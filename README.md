@@ -226,7 +226,7 @@ The preparation for a real-world experiment does not require any actions on your
 You are required only to provide functional code for trajectory planning contained in the `mrim_planner`.
 If you created other ROS nodes, which shall be run separately to the `mrim_planner`, include their launching in `mrim_planner/launch/planner.launch`.
 
-## Problem sets
+## Problem sets - Testing
 
 You have three problems prepared for testing and evaluating your solution.
 The problems are located in `mrim_resources/problems`: you can switch between them by changing the `problem/name` line in `mrim_planner/config/virtual.yaml` to:
