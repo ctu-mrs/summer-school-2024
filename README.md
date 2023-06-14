@@ -24,14 +24,16 @@ No further changes are made to the host operating system.
 Requirements: Linux OS, approx. 5 GB of HDD space.
 For a non-Ubuntu OS, please, install the Singularity on your own.
 
-1) If you are a `git` veteran, you should `fork` the git repository [github.com/ctu-mrs/summer-school-2023](https://github.com/ctu-mrs/summer-school-2023). This will allow you to store changes to our code. Do not forget to make your fork private unless you want other participants to be able to peek into your code.
-__UPDATE:__ Forked repositories on github cannot be made private. Workaround: Instead of forking the repository, click the plus sign in the top right corner, select Import repository, type in the original repo address `https://github.com/ctu-mrs/summer-school-2023.git` and then the name of your new repository. In the bottom part of the form, you can select Private. 
-2) Clone the repository to `~/git`:
+1. If you are a `git` veteran, you should `fork` the git repository [github.com/ctu-mrs/summer-school-2023](https://github.com/ctu-mrs/summer-school-2023). This will allow you to store changes to our code. Do not forget to make your fork private unless you want other participants to be able to peek into your code.
+**UPDATE:** Forked repositories on github cannot be made private. Workaround: Instead of forking the repository, click the plus sign in the top right corner, select Import repository, type in the original repo address `https://github.com/ctu-mrs/summer-school-2023.git` and then the name of your new repository. In the bottom part of the form, you can select Private. 
+
+2. Clone the repository to `~/git`:
 ```bash
 mkdir -p ${HOME}/git
 cd ${HOME}/git && git clone https://github.com/ctu-mrs/summer-school-2023.git
 ```
-3) **(on your personal computers only)** Run the installation script that will install dependencies, download the MRS singularity image containing [MRS UAV System](https://github.com/ctu-mrs/mrs_uav_system), and compile the workspace:
+
+3. **(on your personal computers only)** Run the installation script that will install dependencies, download the MRS singularity image containing [MRS UAV System](https://github.com/ctu-mrs/mrs_uav_system), and compile the workspace:
 ```bash
 cd ${HOME}/git/summer-school-2023 && ./install.sh
 ```
@@ -41,7 +43,7 @@ cd ${HOME}/git/summer-school-2023 && ./install.sh
 You are given two UAVs (Red 🟥 and Blue 🟦) required to inspect a set of **inspections points (IPs)** as fast as possible in a 3D environment with obstacles.
 The two UAVs are equipped with the [MRS control pipeline](https://github.com/ctu-mrs/uav_core) [1], allowing precise trajectory tracking.
 Your task is to assign the IPs to the UAVs and to generate multi-goal paths visiting **viewpoints (VPs)** (poses in which the particular IPs are inspected with on-board cameras) of each IP while keeping a safe distance from the obstacles and between the two UAVs.
-Furthermore, you shall convert paths to collision-free time-parametrized trajectories that respect the UAVs' dynamic constraints.
+Furthermore, you shall convert paths to collision-free time-parametrized trajectories that respect the UAVs' dynamic [constraints](#constraints).
 The IPs are defined by their position and inspection angle and are divided into three subsets:
 
 1. 🔴 red locations: inspectable by 🟥 UAV only,
@@ -62,18 +64,18 @@ The motion blur effect during imaging is neglected; thus, the UAVs are not requi
 
 There is a low-performance solution available at your hands.
 This solution consists of:
-  * non-controlled heading of the UAVs,
-  * random assignment of IPs in 🟣 to UAVs,
-  * computation of TSP (Traveling Salesman Problem) tours using Euclidean distance estimates,
-  * planning paths with the use of badly parametrized RRT planner,
-  * generation of trajectories with required zero velocity at the end of each straight segment,
-  * collision avoidance is disabled.
+* non-controlled heading of the UAVs,
+* random assignment of IPs in 🟣 to UAVs,
+* computation of TSP (Traveling Salesman Problem) tours using Euclidean distance estimates,
+* planning paths with the use of badly parametrized RRT planner,
+* generation of trajectories with required zero velocity at the end of each straight segment,
+* collision avoidance is disabled.
 
 The solution produced by this approach has very poor performance and does not score any points, yet provides large space for improvement.
 To improve the solution, you can follow the steps suggested below or find your way to improve the solution.
 Please go through the code and its inline comments to give you a better idea about individual tips.
 
-**Tips for improving the solution:**
+  **Tips for improving the solution:**
 
   1. Interpolate the heading between the samples. This is the first thing to solve if you want to score!
   2. Test different methods available for estimating the distance between the VPs and for planning collision-free paths connecting the VPs [available planners: A*, RRT (default), RRT*].
@@ -85,6 +87,12 @@ Please go through the code and its inline comments to give you a better idea abo
   8. Postprocess the time-parametrized trajectories to resolve collisions. Start by improving the implemented collision avoidance, e.g., by delaying trajectory start till there is no collision. Tip: try the methods available for you in the config file (see below).
   9. Effectively redistribute IPs to avoid collisions and to achieve lower inspection time.
 
+  **Things to avoid:**
+
+* Too high minimum distance from obstacles could lead to path planners failing to find a path to some locations.
+* Smoothing and shortening the path in locations of inspections could lead to missing the inspection point.
+* Sampling on a grid with a small resolution could lead to errors emerging from discretization.
+
 Note that the task in its generality is very complex to be solved in a limited time during several days.
 You are not expected to solve every subproblem so do not feel bad if you don't.
 Instead, try to exploit and improve the parts of the solution you are most interested in or think to improve the solution the most.
@@ -93,20 +101,36 @@ We limit your computational time to speed up the flow of the competition.
 Although we prepared a skeleton solution as a baseline, **feel free to design your algorithms to improve the overall performance**.
 Good luck!
 
-**Things to avoid:**
+### Constraints
 
-* Too high minimum distance from obstacles could lead to path planners failing to find a path to some locations.
-* Smoothing and shortening the path in locations of inspections could lead to missing the inspection point.
-* Sampling on a grid with a small resolution could lead to errors emerging from discretization.
+Your solution to both the challenges has to conform to constraints summarized in the following table:
 
-### Where to code changes
+| Constraint                                          | Virtual challenge | Real-world challenge |
+| :---                                                | :---:             | :---:                |
+| Maximum solution time (soft) - $T_s$                | 40 s              | 30 s                 |
+| Maximum solution time (hard)                        | 120 s             | 60 s                 |
+| Maximum mission time                                | 200 s             | 240 s                |
+| Maximum velocity per x and y axes                   | 2 m/s             | 1 m/s                |
+| Maximum velocity in z axis                          | 1 m/s             | 0.5 m/s              |
+| Maximum acceleration per x and y axes               | 2 m/s^2           | 1 m/s^2              |
+| Maximum acceleration in z axis                      | 1 m/s^2           | 0.5 m/s^2            |
+| Maximum heading rate                                | 0.5 rad/s         | 0.5 rad/s            |
+| Maximum heading acceleration                        | 1 rad/s^2         | 1 rad/s^2            |
+| Minimum obstacle distance                           | 1.5 m             | 2.0 m                |
+| Minimum mutual distance                             | 2.0 m             | 3.0 m                |
+| Dist. from starting position to stop the mission:\* | 1.0 m             | 1.0 m                |
+
+\* The last point of the trajectory is expected to match the starting point with up to 1 m tolerance.
+
+## Where to code changes
+
 Change your code within directory `summer-school-2023/mrim_task/mrim_planner` in files:
 
-  * `scripts/`
-    * `planner.py`: Crossroad script where the path to your solution begins. Here you will find initial ideas and examples on how to load parameters.
-    * `trajectory.py`: Contains functionalities for basic work with trajectories. Here, you can **interpolate heading** between the path waypoints and experiment with smoothing the paths, sampling the trajectories, computing collisions between points/paths/trajectories, or postprocessing trajectories to prevent collisions.
-    * `solvers/`
-      * `tsp_solvers.py`: This is where VPs assignment for TSP, path planning, and solving TSP happens. Here you can play with an efficient assignment of VPs to UAVs or study the effect of path planners on TSP solution performance.
+* `scripts/`
+  * `planner.py`: Crossroad script where the path to your solution begins. Here you will find initial ideas and examples on how to load parameters.
+  * `trajectory.py`: Contains functionalities for basic work with trajectories. Here, you can **interpolate heading** between the path waypoints and experiment with smoothing the paths, sampling the trajectories, computing collisions between points/paths/trajectories, or postprocessing trajectories to prevent collisions.
+  * `solvers/`
+    * `tsp_solvers.py`: This is where VPs assignment for TSP, path planning, and solving TSP happens. Here you can play with an efficient assignment of VPs to UAVs or study the effect of path planners on TSP solution performance.
     * `utils.py`: Default source of various utility functions. Feel free to add your own.
   * `config/`
     * `virtual.yaml` and `real_world.yaml`: Config files (for two challenges described below) containing various parameters/switches for the task. If you need other parameters, add them here, load them in `scripts/planner.py` and use them in the code accordingly.
@@ -122,7 +146,7 @@ Check `mrim_planner/scripts/data_types.py` to see what the classes do.
 Apart from the configs in `mrim_planner/config`, default configs for the mission are loaded from `mrim_manager/config` for each run type.
 Take a look here to see the trajectories' dynamic constraints or safety limits.
 
-### Run your code
+## Run your code
 
 A set of scripts is provided in `simulation/`, allowing you to start and stop the simulation and evaluate your code.
 The **bold** scripts are expected to be used directly by the user.
@@ -153,10 +177,11 @@ The RViz (ROS visualization) shows an **example solution** to the task.
 
 The RViz window contains:
 
-  * start/pause button in the left bottom corner
-  * overall trajectories information in the top left/right corners (background is green if every check is OK, red otherwise)
-  * current flight statistics right below
-  * information about the mission and the score centered in the top
+* start/pause button in the left bottom corner
+* overall trajectories information in the top left/right corners (background is green if every check is OK, red otherwise)
+* current flight statistics right below
+* information about the mission and the score centered in the top
+* lines intersecting both paths which indicate collisions.
 
 **2) Online: run simulation locally**
 
@@ -168,11 +193,13 @@ Stopping the simulation is done by calling
 ```bash
 ./simulation/kill_simulation.sh
 ```
-By default, the `run_simulation.sh` spawns you 2 UAVs in the `single_tower` world.
+**Things to configure/change :**
+* **Problem Type:** By default, the `run_simulation.sh` spawns you 2 UAVs in the `single_tower` world.
 To change the world to `four_towers`, you have to
 
-1. change the parameter `problem/name` in the `mrim_task/mrim_planner/config/virtual.yaml` to one of the `four_towers` problems (see section [Testing](https://github.com/ctu-mrs/summer-school-2023#testing)) and
-2. change variable `PROBLEM` in `simulation/tmux_scripts/simulation/session.yml` from `export PROBLEM=single_tower` to `export PROBLEM=four_towers`.
+  * change the parameter `problem/name` in the `mrim_task/mrim_planner/config/virtual.yaml` to one of the `four_towers` problems (see section [Testing](https://github.com/ctu-mrs/summer-school-2023#testing)) and
+  * change variable `PROBLEM` in `simulation/tmux_scripts/simulation/session.yml` from `export PROBLEM=single_tower` to `export PROBLEM=four_towers`.
+* **Gazebo GUI:** The GUI of Gazebo simulator is disabled by default to not stress-out your system. You can enable it by changing the variable `GUI` in `simulation/tmux_scripts/simulation/session.yml` from `export GUI=false` to `export GUI=true`.
 
 You may notice that your terminal opened multiple tabs.
 Check the first page of the [MRS Cheatsheet](https://github.com/ctu-mrs/mrs_cheatsheet) if you need help navigating the tabs and panes.
@@ -199,7 +226,7 @@ The preparation for a real-world experiment does not require any actions on your
 You are required only to provide functional code for trajectory planning contained in the `mrim_planner`.
 If you created other ROS nodes, which shall be run separately to the `mrim_planner`, include their launching in `mrim_planner/launch/planner.launch`.
 
-## Testing
+## Problem sets - Testing
 
 You have three problems prepared for testing and evaluating your solution.
 The problems are located in `mrim_resources/problems`: you can switch between them by changing the `problem/name` line in `mrim_planner/config/virtual.yaml` to:
@@ -216,7 +243,7 @@ There will be two competitions:
   2. in the real world.
 
 To participate in the competitions, you must send your solution in a single archive file by email until Thursday at 11:59 p.m.
-Please, **email us** the code to `tomas.baca@fel.cvut.cz` with the subject **SUMMER SCHOOL TASK** till Thursday 11:59 p.m., zipped with your *Team's name* as:
+Please, **email us** the code to `guptapar@fel.cvut.cz` with the subject **SUMMER SCHOOL TASK** till Thursday 11:59 p.m., zipped with your *Team's name* as:
 ```bash
 zip -r my_team_name.zip mrim_planner
 ```
@@ -235,14 +262,14 @@ The results will be presented during an awards ceremony organized at the experim
   2. violation of minimum allowed distance between obstacles and UAVs,
   3. violation of minimum allowed mutual distance between UAVs,
   4. violation of maximum distance of final trajectory point to the predefined starting location,
-  5. exceeding the hard maximum available time for computing a solution (see the table below).
+  5. exceeding the hard maximum available time for computing a solution (see the [constraints](#constraints) table).
 
-In case of a tie, **secondary key** to determine the final order of the participating teams is given as $T_I + T_P$ (in seconds), where $T_I$ is the inspection time (start to end of both trajectories) and $T_P = max(0, T_C - T_s)$ is the time $T_C$ it took to compute the solution minus the the soft limit $T_s$ for computing the solution (see table below).
+In case of a tie, **secondary key** to determine the finishing order of the participating teams is given as $T_I + T_P$ (in seconds), where $T_I$ is the inspection time (start to end of both trajectories) and $T_P = max(0, T_C - T_s)$ is the time $T_C$ it took to compute the solution minus the the soft limit $T_s$ for computing the solution (see the [constraints](#constraints) table).
 
 ### Virtual
 
 The dimensions of the virtual environment and inspection problem will be similar to `four_towers_large.problem`.
-Your solution for the virtual environment has to conform to constraints summarized in the table below.
+Your solution for the virtual environment has to conform to constraints summarized in the table above.
 
 ### Real-world
 
@@ -252,24 +279,6 @@ No changes are required on your side.
 However, note that the evaluation of inspected points will be based on the actual pose of the UAV in the world, not the reference trajectories.
 Hence, the effect of trajectory tracking will not be negligible, and you should consider the challenges of the real-world environment.
 Consider the challenges during parametrization and prepare your solution for deviations from the ideal conditions. E.g., introduce reserves for UAV-to-UAV and UAV-to-obstacles distances to prevent unfortunate zeroing of your score or lower the magnitude of allowed deviations from the reference trajectory.
-Your solution to both the challenges has to conform to constraints summarized in the following table:
-
-| Constraint                                          | Virtual challenge | Real-world challenge |
-| :---                                                | :---:             | :---:                |
-| Maximum solution time (soft):                       | 40 s              | 30 s                 |
-| Maximum solution time (hard):                       | 120 s             | 60 s                 |
-| Maximum mission time:                               | 200 s             | 240 s                |
-| Maximum velocity per x and y axes:                  | 2 m/s             | 1 m/s                |
-| Maximum velocity in z axis:                         | 1 m/s             | 0.5 m/s              |
-| Maximum acceleration per x and y axes:              | 2 m/s^2           | 1 m/s^2              |
-| Maximum acceleration in z axis:                     | 1 m/s^2           | 0.5 m/s^2            |
-| Maximum heading rate:                               | 0.5 rad/s         | 0.5 rad/s            |
-| Maximum heading acceleration:                       | 1 rad/s^2         | 1 rad/s^2            |
-| Minimum obstacle distance:                          | 1.5 m             | 2.0 m                |
-| Minimum mutual distance:                            | 2.0 m             | 3.0 m                |
-| Dist. from starting position to stop the mission:\* | 1.0 m             | 1.0 m                |
-
-\* The last point of the trajectory is expected to match the starting point with up to 1 m tolerance.
 
 ## Explore another possible usage of the MRS UAV System
 
@@ -277,7 +286,7 @@ Based on the presentation of the MRS system, you can also try other capabilities
 You selected a group of practicals based on your scientific interest.
 Feel free to ask during the summer school and especially during the seminars how the system can be used for your area of interest.
 
-## TROUBLESHOOTING
+## Troubleshooting
 
 **Updating the repository**
 
@@ -295,21 +304,20 @@ Sometimes just writing the question down helps you to understand the problem.
 
 If you find a bug in the task, you need assistance, or you have any other questions, please contact by email one of (or all of):
 
-  * Pavel Petracek `petrapa6@fel.cvut.cz`
-  * Vit Kratky `kratkvit@fel.cvut.cz`
-  * Tomas Baca `tomas.baca@fel.cvut.cz`
+* Parakh M. Gupta `guptapar@fel.cvut.cz`
+* Filip Novák `novakfi8@fel.cvut.cz`
 
 We will try to help you as soon as possible.
 
-## DISCLAIMER
+## Disclaimer
 
 During the week of the 2023 MRS Summer School, the organizers reserve the right to:
 
-  * to do fixes: to update the task in case of finding severe bugs in the code,
-  * to maintain fairness: to change the problems or the constraints for the challenges,
-  * to preserve safety: to discard provided trajectories for the real-world challenge if the flight would be unsafe in any possible way.
+* to do fixes: to update the task in case of finding severe bugs in the code,
+* to maintain fairness: to change the problems or the constraints for the challenges,
+* to preserve safety: to discard provided trajectories for the real-world challenge if the flight would be unsafe in any possible way.
 
-## REFERENCES
+## References
 
 * [1]  Baca, T., Petrlik, M., Vrba, M., Spurny, V., Penicka, R., Hert, D., and Saska, M., [The MRS UAV System: Pushing the Frontiers of Reproducible Research, Real-world Deployment, and Education with Autonomous Unmanned Aerial Vehicles](https://arxiv.org/pdf/2008.08050), _Journal of Intelligent & Robotic Systems 102(26):1–28, May 2021_, GitHub: https://github.com/ctu-mrs/mrs_uav_system.
 * [2]  H. Pham, Q. C. Pham, [A New Approach to Time-Optimal Path Parameterization Based on Reachability Analysis](https://www.researchgate.net/publication/318671280_A_New_Approach_to_Time-Optimal_Path_Parameterization_Based_on_Reachability_Analysis), [Documentation](https://hungpham2511.github.io/toppra/index.html)
