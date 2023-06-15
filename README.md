@@ -177,11 +177,11 @@ The RViz (ROS visualization) shows an **example solution** to the task.
 
 The RViz window contains:
 
-  * start/pause button in the left bottom corner
-  * overall trajectories information in the top left/right corners (background is green if every check is OK, red otherwise)
-  * current flight statistics right below
-  * information about the mission and the score centered in the top
-  * lines intersecting both paths which indicate collisions.
+* start/pause button in the left bottom corner
+* overall trajectories information in the top left/right corners (background is green if every check is OK, red otherwise)
+* current flight statistics right below
+* information about the mission and the score centered in the top
+* lines intersecting both paths which indicate collisions.
 
 **2) Online: run simulation locally**
 
@@ -193,11 +193,13 @@ Stopping the simulation is done by calling
 ```bash
 ./simulation/kill_simulation.sh
 ```
-By default, the `run_simulation.sh` spawns you 2 UAVs in the `single_tower` world.
+**Things to configure/change :**
+* **Problem Type:** By default, the `run_simulation.sh` spawns you 2 UAVs in the `single_tower` world.
 To change the world to `four_towers`, you have to
 
-1. change the parameter `problem/name` in the `mrim_task/mrim_planner/config/virtual.yaml` to one of the `four_towers` problems (see section [Testing](https://github.com/ctu-mrs/summer-school-2023#testing)) and
-2. change variable `PROBLEM` in `simulation/tmux_scripts/simulation/session.yml` from `export PROBLEM=single_tower` to `export PROBLEM=four_towers`.
+  * change the parameter `problem/name` in the `mrim_task/mrim_planner/config/virtual.yaml` to one of the `four_towers` problems (see section [Testing](https://github.com/ctu-mrs/summer-school-2023#testing)) and
+  * change variable `PROBLEM` in `simulation/tmux_scripts/simulation/session.yml` from `export PROBLEM=single_tower` to `export PROBLEM=four_towers`.
+* **Gazebo GUI:** The GUI of Gazebo simulator is disabled by default to not stress-out your system. You can enable it by changing the variable `GUI` in `simulation/tmux_scripts/simulation/session.yml` from `export GUI=false` to `export GUI=true`.
 
 You may notice that your terminal opened multiple tabs.
 Check the first page of the [MRS Cheatsheet](https://github.com/ctu-mrs/mrs_cheatsheet) if you need help navigating the tabs and panes.
@@ -224,7 +226,7 @@ The preparation for a real-world experiment does not require any actions on your
 You are required only to provide functional code for trajectory planning contained in the `mrim_planner`.
 If you created other ROS nodes, which shall be run separately to the `mrim_planner`, include their launching in `mrim_planner/launch/planner.launch`.
 
-## Problem sets
+## Problem sets - Testing
 
 You have three problems prepared for testing and evaluating your solution.
 The problems are located in `mrim_resources/problems`: you can switch between them by changing the `problem/name` line in `mrim_planner/config/virtual.yaml` to:
@@ -256,7 +258,7 @@ The results will be presented during an awards ceremony organized at the experim
 
 **Reasons to assign zero score (and thus to disqualify the solution):**
 
-  1. violation of assigned dynamic [constraints](#constraints) of UAVs (**in horizontal and vertical directions only**; violation of constraints on heading does not affect the score but beware that the heading rate/acceleration of the UAV controller will be limited by these constraints),
+  1. violation of assigned dynamic constraints of UAVs (**in horizontal and vertical directions only**; violation of constraints on heading does not affect the score but beware that the heading rate/acceleration of the UAV controller will be limited by these constraints),
   2. violation of minimum allowed distance between obstacles and UAVs,
   3. violation of minimum allowed mutual distance between UAVs,
   4. violation of maximum distance of final trajectory point to the predefined starting location,
@@ -267,7 +269,7 @@ In case of a tie, **secondary key** to determine the finishing order of the part
 ### Virtual
 
 The dimensions of the virtual environment and inspection problem will be similar to `four_towers_large.problem`.
-Your solution for the virtual environment has to conform to constraints summarized in the table [above](#constraints).
+Your solution for the virtual environment has to conform to constraints summarized in the table above.
 
 ### Real-world
 
