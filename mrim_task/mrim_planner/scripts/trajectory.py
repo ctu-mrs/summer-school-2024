@@ -6,7 +6,7 @@ Custom TSP Loader
 import math
 import dubins
 
-from utils import segmentPointDist, distEuclidean, lineSphereIntersections, simulateStep, wrapAngle, angleDiff
+from utils import segmentPointDist, distEuclidean, lineSphereIntersections, simulateStep, wrapAngle, angleDiff, poseInDistance
 from data_types import Pose, Viewpoint
 import numpy as np
 
