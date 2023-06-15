@@ -314,7 +314,7 @@ class MrimManager:
         traveled_dist_publishers = []
         for k in range(self.inspection_problem.number_of_robots):
             jsk_diagnostics_publishers.append(rospy.Publisher('/visualization/diagnostics_jsk_' + str(k+1), OverlayText, queue_size=1))
-            cones_publishers.append(rospy.Publisher('/visualization/cone_' + str(k+1) , Marker, queue_size=1))
+            cones_publishers.append(rospy.Publisher('/visualization/cone_' + str(k+1) , Marker, queue_size=2))
             path_publishers.append(rospy.Publisher('/visualization/path_' + str(k+1), Path, queue_size=1))
             odometry_publishers.append(rospy.Publisher('/visualization/odom_' + str(k+1), Odometry, queue_size=1))
             horizon_publishers.append(rospy.Publisher('/visualization/horizon_' + str(k+1), PoseArray, queue_size=1))
