@@ -6,7 +6,9 @@ Custom TSP Loader
 import math
 import dubins
 
-from utils import *
+from utils import segmentPointDist, distEuclidean, lineSphereIntersections, simulateStep, wrapAngle, angleDiff
+from data_types import Pose, Viewpoint
+import numpy as np
 
 import toppra as ta
 import toppra.constraint as constraint
@@ -145,7 +147,7 @@ class TrajectoryUtils():
 
     # # #{ interpolateHeading()
 
-    def interpolateHeading(self, waypoints):
+    def interpolateHeading(self, waypoints:Viewpoint):
         '''
         Interpolates linearly the UAV heading between waypoints.
 
@@ -176,12 +178,13 @@ class TrajectoryUtils():
                     idx = i
                     break
 
-            # get desired heading change in interval <0, 2pi)
+            # get desired heading change from the beginning to end of this subtrajectory
             g_to  = subtraj[-1]
-            d_hdg = wrapAngle(g_to.heading - g_from.heading)
+            delta_heading = wrapAngle(g_to.heading - g_from.heading)
 
             # get initial heading and subtraj length
             hdg_from    = wrapAngle(g_from.heading)
+            current_heading = hdg_from
             subtraj_len = self.getLength(subtraj)
 
             ## | ----------------------- Interpolate ---------------------- |
@@ -197,16 +200,18 @@ class TrajectoryUtils():
 
                 # [STUDENTS TODO, COMPULSORY] Implement heading interpolation here
                 # Tips:
+                #  - subtrajectory is a section of trajectory and consists of poses to follow during this segment
                 #  - interpolate the heading linearly (create a function of distance between two points of the subpath)
-                #  - do not forget to wrap angle to <-pi, pi) (see/use wrapAngle() in utils.py)
+                #  - do not forget to wrap angle to (-pi, pi) (see/use wrapAngle() in utils.py)
+                #  - see/use distEuclidean() in utils.py
 
-                # [STUDENTS TODO] Change variable 'hdg_interp', nothing else
-                hdg_interp = waypoints[0].heading
+                # [STUDENTS TODO] Change variable 'desired_heading', nothing else
+                desired_heading = waypoints[0].heading
 
                 # replace heading
-                hdg_from   = hdg_interp
+                current_heading   = desired_heading
                 wp         = subtraj[i]
-                wp.heading = hdg_interp
+                wp.heading = desired_heading
                 wps_interp.append(wp)
 
         # include the very last node
