@@ -100,6 +100,23 @@ class Evaluator:
         heading_dev = abs(wrapAngle(heading - viewpoint.heading))
         is_in_hfov = abs(wrapAngle(pose.heading - heading)) < self.horizontal_aovs[robot_index]/2
         pitch_dev = abs(math.atan2(inspection_point.position.z - pose.z, dev_xy))
+
+        # SE3 Matrix = |Rotation, Translation|
+        #              |0,        1         |
+        Drone_to_World = np.array([
+            [math.cos(pose.heading), -math.sin(pose.heading), 0.0, pose.x],
+            [math.sin(pose.heading), math.cos(pose.heading), 0.0, pose.y],
+            [0.0, 0.0, 1.0, pose.z],
+            [0.0, 0.0, 0.0, 1.0]])
+        World_to_Drone = np.linalg.inv(Drone_to_World)
+        # R_T = np.array([[math.cos(pose.heading),math.sin(pose.heading),0.0],\
+        #                 [-math.sin(pose.heading),math.cos(pose.heading),0.0],\
+        #                 [0.0,0.0,1.0]])
+        # rand_vect = np.matmul(-R_T, np.array([pose.x, pose.y, pose.z]))
+        # Alt_World_to_Drone = np.array([[math.cos(pose.heading),math.sin(pose.heading),0.0,rand_vect[0]],\
+        #                 [-math.sin(pose.heading),math.cos(pose.heading),0.0,rand_vect[1]],\
+        #                 [0.0,0.0,1.0,rand_vect[2]],
+        #                 [0.0,0.0,0.0,1.0]])
         return dist_dev <= self.allowed_dist_dev and heading_dev <= self.allowed_heading_dev and pitch_dev <= self.allowed_pitch_dev and is_in_hfov
 
     def inspectionPointToViewPoint(self, inspection_point):
