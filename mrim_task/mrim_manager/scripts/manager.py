@@ -42,9 +42,10 @@ def signal_handler(sig, frame):
 # #{ class Evaluator
 
 class Evaluator:
-    def __init__(self, inspection_problem, viewpoints_distance, allowed_dist_deviation, allowed_heading_deviation, allowed_pitch_deviation, horizontal_aovs):
+    def __init__(self, inspection_problem, viewpoints_t_distance, viewpoints_s_distance, allowed_dist_deviation, allowed_heading_deviation, allowed_pitch_deviation, horizontal_aovs):
         # load problem
-        self.viewpoints_distance = viewpoints_distance
+        self.viewpoints_t_distance = viewpoints_t_distance
+        self.viewpoints_s_distance = viewpoints_s_distance
         self.inspection_problem = inspection_problem
         self.viewpoints = self.getInspectionViewpoints(inspection_problem)
         self.allowed_dist_dev = allowed_dist_deviation
@@ -86,8 +87,15 @@ class Evaluator:
                         self.viewpoints[k].is_inspected = self.isPointInspected(self.viewpoints[k], self.inspection_problem.inspection_points[k], poses[r], r)
 
     def isPointInspected(self, viewpoint, inspection_point, pose, robot_index):
+        if inspection_point.type == 't':
+            viewpoints_distance = self.viewpoints_t_distance
+        elif inspection_point.type == 's':
+            viewpoints_distance = self.viewpoints_s_distance
+        else:
+            raise Exception(f"Type '{inspection_point.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
+        # TODO: use correct camera FOV for solar panel points  
         dev_xy = np.sqrt((inspection_point.position.x - pose.x)**2 + (inspection_point.position.y - pose.y)**2)
-        dist_dev = abs(np.sqrt(dev_xy**2 + (inspection_point.position.z - pose.z)**2) - self.viewpoints_distance)
+        dist_dev = abs(np.sqrt(dev_xy**2 + (inspection_point.position.z - pose.z)**2) - viewpoints_distance)
         heading = wrapAngle(math.atan2(inspection_point.position.y - pose.y, inspection_point.position.x - pose.x))
         heading_dev = abs(wrapAngle(heading - viewpoint.heading))
         is_in_hfov = abs(wrapAngle(pose.heading - heading)) < self.horizontal_aovs[robot_index]/2
@@ -95,9 +103,18 @@ class Evaluator:
         return dist_dev <= self.allowed_dist_dev and heading_dev <= self.allowed_heading_dev and pitch_dev <= self.allowed_pitch_dev and is_in_hfov
 
     def inspectionPointToViewPoint(self, inspection_point):
-        x       = inspection_point.position.x + self.viewpoints_distance * np.cos(inspection_point.inspect_heading)
-        y       = inspection_point.position.y + self.viewpoints_distance * np.sin(inspection_point.inspect_heading)
-        z       = inspection_point.position.z
+        if inspection_point.type == 't':
+            x       = inspection_point.position.x + self.viewpoints_t_distance * np.cos(inspection_point.inspect_heading)
+            y       = inspection_point.position.y + self.viewpoints_t_distance * np.sin(inspection_point.inspect_heading)
+            z       = inspection_point.position.z
+        elif inspection_point.type == 's':
+            x       = inspection_point.position.x
+            y       = inspection_point.position.y
+            z       = inspection_point.position.z + self.viewpoints_s_distance
+        else:
+            raise Exception(f"Type '{inspection_point.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
+
+
         heading = np.unwrap([inspection_point.inspect_heading + np.pi])[0]
         color_index = inspection_point.inspectability[0] if len(inspection_point.inspectability) == 1 else 0
 
@@ -167,7 +184,8 @@ class MrimManager:
         rviz_config = rospy.get_param('~rviz_config')
         self.print_info = rospy.get_param('~print_info')
         global_frame = rospy.get_param('~global_frame')
-        viewpoint_distance = rospy.get_param('~viewpoints/distance')
+        viewpoint_t_distance = rospy.get_param('~viewpoints/t_distance')
+        viewpoint_s_distance = rospy.get_param('~viewpoints/s_distance')
         allowed_dist_dev = rospy.get_param('~viewpoints/inspection_limits/distance')
         allowed_heading_dev = rospy.get_param('~viewpoints/inspection_limits/heading')
         allowed_pitch_dev = rospy.get_param('~viewpoints/inspection_limits/pitch')
@@ -271,7 +289,7 @@ class MrimManager:
 
         self.pcl_map = PclKDTree(self.inspection_problem.obstacle_points)
 
-        self.evaluator_ = Evaluator(self.inspection_problem, viewpoint_distance, allowed_dist_dev, allowed_heading_dev, allowed_pitch_dev, [horizontal_aov_1, horizontal_aov_2])
+        self.evaluator_ = Evaluator(self.inspection_problem, viewpoint_t_distance, viewpoint_s_distance, allowed_dist_dev, allowed_heading_dev, allowed_pitch_dev, [horizontal_aov_1, horizontal_aov_2])
 
         rospy.loginfo("[MrimManager] Starting trajectory checker.")
 
