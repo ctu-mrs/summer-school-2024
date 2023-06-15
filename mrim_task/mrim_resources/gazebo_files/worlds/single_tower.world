@@ -149,7 +149,7 @@
     </plugin>
     <!--}-->
 
-      <!-- power tower libomysl {-->
+      <!-- single tower model {-->
       
       <include>
         <uri>model://single_tower</uri>

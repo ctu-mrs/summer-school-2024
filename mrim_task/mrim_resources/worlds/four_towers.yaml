@@ -22,10 +22,10 @@ safety_area:
   frame_name: "gps_origin"
 
   # convex polygon CCW
-  safety_area: [-8, -12,
-                18, -12,
+  safety_area: [-13, -18,
+                18, -18,
                 18, 13,
-                -8, 13]
+                -13, 13]
 
   polygon_obstacles:
     # loaded as a vector of matrices
