@@ -42,7 +42,7 @@ def signal_handler(sig, frame):
 # #{ class Evaluator
 
 class Evaluator:
-    def __init__(self, inspection_problem, viewpoints_t_distance, viewpoints_s_distance, allowed_dist_deviation, allowed_heading_deviation, allowed_pitch_deviation, horizontal_aovs):
+    def __init__(self, inspection_problem, viewpoints_t_distance, viewpoints_s_distance, allowed_dist_deviation, allowed_heading_deviation, allowed_pitch_deviation, horizontal_aovs, vertical_aovs):
         # load problem
         self.viewpoints_t_distance = viewpoints_t_distance
         self.viewpoints_s_distance = viewpoints_s_distance
@@ -52,6 +52,7 @@ class Evaluator:
         self.allowed_heading_dev = allowed_heading_deviation
         self.allowed_pitch_dev = allowed_pitch_deviation
         self.horizontal_aovs = horizontal_aovs
+        self.vertical_aovs = vertical_aovs
         self.start_poses = inspection_problem.start_poses
         self.zero_score = False
 
@@ -87,37 +88,54 @@ class Evaluator:
                         self.viewpoints[k].is_inspected = self.isPointInspected(self.viewpoints[k], self.inspection_problem.inspection_points[k], poses[r], r)
 
     def isPointInspected(self, viewpoint, inspection_point, pose, robot_index):
+        print("inspection point type: ", inspection_point.type, "robot number ", robot_index+1)
         if inspection_point.type == 't':
             viewpoints_distance = self.viewpoints_t_distance
+            dev_xy = np.sqrt((inspection_point.position.x - pose.x)**2 + (inspection_point.position.y - pose.y)**2)
+            dist_dev = abs(np.sqrt(dev_xy**2 + (inspection_point.position.z - pose.z)**2) - viewpoints_distance)
+            heading = wrapAngle(math.atan2(inspection_point.position.y - pose.y, inspection_point.position.x - pose.x))
+            heading_dev = abs(wrapAngle(heading - viewpoint.heading))
+            is_in_hfov = abs(wrapAngle(pose.heading - heading)) < self.horizontal_aovs[robot_index]/2
+            pitch_dev = abs(math.atan2(inspection_point.position.z - pose.z, dev_xy))
+            return dist_dev <= self.allowed_dist_dev and heading_dev <= self.allowed_heading_dev and pitch_dev <= self.allowed_pitch_dev and is_in_hfov
         elif inspection_point.type == 's':
             viewpoints_distance = self.viewpoints_s_distance
+            is_at_correct_altitude = abs(
+                (pose.z - inspection_point.position.z)-viewpoints_distance) < self.allowed_dist_dev
+            # SE3 Matrix = |Rotation, Translation|
+            #              |0,        1         |
+            Drone_to_World = np.array([
+                [math.cos(pose.heading), -math.sin(pose.heading), 0.0, pose.x],
+                [math.sin(pose.heading), math.cos(pose.heading), 0.0, pose.y],
+                [0.0, 0.0, 1.0, pose.z],
+                [0.0, 0.0, 0.0, 1.0]])
+            World_to_Drone = np.linalg.inv(Drone_to_World)
+            inspection_point_transformed = np.matmul(World_to_Drone, np.array([inspection_point.position.x,
+                                                                               inspection_point.position.y,
+                                                                               inspection_point.position.z,
+                                                                               1.0]))
+            print("Inspection point co-ordinates: ",
+                  inspection_point_transformed)
+            theta_xz = math.atan2(inspection_point_transformed[2],
+                                  inspection_point_transformed[0])
+            print("theta_xz is ", theta_xz)
+            # theta_xz should be greater than -((pi/2)+(vfov/2)) and less than -((pi/2)-(vfov/2))
+            # is_in_vfov = (theta_xz > -((math.pi/2)+(self.vertical_aovs[robot_index]/2)) and theta_xz < -((math.pi/2)-(self.vertical_aovs[robot_index]/2)))
+            is_in_vfov = abs(theta_xz-(-math.pi/2)
+                             ) <= self.vertical_aovs[robot_index]/2
+            theta_xy = math.atan2(inspection_point_transformed[2],
+                                  inspection_point_transformed[1])
+            print("theta_xy is ", theta_xy)
+            # is_in_hfov = (theta_xy > -((math.pi/2)+(self.horizontal_aovs[robot_index]/2)) and theta_xy < -((math.pi/2)-(self.horizontal_aovs[robot_index]/2)))
+            is_in_hfov = abs(theta_xy-(-math.pi/2)
+                             ) <= self.horizontal_aovs[robot_index]/2
+            # theta_xy should be greater than -((pi/2)+(hfov/2)) and less than -((pi/2)-(hfov/2))
+            print("is in hfov: ", is_in_hfov, " is in vfov: ", is_in_vfov, " is at correct altitude: ", is_at_correct_altitude)
+            return is_in_hfov and is_in_vfov and is_at_correct_altitude
         else:
-            raise Exception(f"Type '{inspection_point.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
-        # TODO: use correct camera FOV for solar panel points  
-        dev_xy = np.sqrt((inspection_point.position.x - pose.x)**2 + (inspection_point.position.y - pose.y)**2)
-        dist_dev = abs(np.sqrt(dev_xy**2 + (inspection_point.position.z - pose.z)**2) - viewpoints_distance)
-        heading = wrapAngle(math.atan2(inspection_point.position.y - pose.y, inspection_point.position.x - pose.x))
-        heading_dev = abs(wrapAngle(heading - viewpoint.heading))
-        is_in_hfov = abs(wrapAngle(pose.heading - heading)) < self.horizontal_aovs[robot_index]/2
-        pitch_dev = abs(math.atan2(inspection_point.position.z - pose.z, dev_xy))
+            raise Exception(
+                f"Type '{inspection_point.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
 
-        # SE3 Matrix = |Rotation, Translation|
-        #              |0,        1         |
-        Drone_to_World = np.array([
-            [math.cos(pose.heading), -math.sin(pose.heading), 0.0, pose.x],
-            [math.sin(pose.heading), math.cos(pose.heading), 0.0, pose.y],
-            [0.0, 0.0, 1.0, pose.z],
-            [0.0, 0.0, 0.0, 1.0]])
-        World_to_Drone = np.linalg.inv(Drone_to_World)
-        # R_T = np.array([[math.cos(pose.heading),math.sin(pose.heading),0.0],\
-        #                 [-math.sin(pose.heading),math.cos(pose.heading),0.0],\
-        #                 [0.0,0.0,1.0]])
-        # rand_vect = np.matmul(-R_T, np.array([pose.x, pose.y, pose.z]))
-        # Alt_World_to_Drone = np.array([[math.cos(pose.heading),math.sin(pose.heading),0.0,rand_vect[0]],\
-        #                 [-math.sin(pose.heading),math.cos(pose.heading),0.0,rand_vect[1]],\
-        #                 [0.0,0.0,1.0,rand_vect[2]],
-        #                 [0.0,0.0,0.0,1.0]])
-        return dist_dev <= self.allowed_dist_dev and heading_dev <= self.allowed_heading_dev and pitch_dev <= self.allowed_pitch_dev and is_in_hfov
 
     def inspectionPointToViewPoint(self, inspection_point):
         if inspection_point.type == 't':
@@ -306,7 +324,8 @@ class MrimManager:
 
         self.pcl_map = PclKDTree(self.inspection_problem.obstacle_points)
 
-        self.evaluator_ = Evaluator(self.inspection_problem, viewpoint_t_distance, viewpoint_s_distance, allowed_dist_dev, allowed_heading_dev, allowed_pitch_dev, [horizontal_aov_1, horizontal_aov_2])
+        self.evaluator_ = Evaluator(self.inspection_problem, viewpoint_t_distance, viewpoint_s_distance,
+                                    allowed_dist_dev, allowed_heading_dev, allowed_pitch_dev, [horizontal_aov_1, horizontal_aov_2], [vertical_aov_1, vertical_aov_2])
 
         rospy.loginfo("[MrimManager] Starting trajectory checker.")
 
