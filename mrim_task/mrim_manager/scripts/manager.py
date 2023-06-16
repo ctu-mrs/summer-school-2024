@@ -88,7 +88,6 @@ class Evaluator:
                         self.viewpoints[k].is_inspected = self.isPointInspected(self.viewpoints[k], self.inspection_problem.inspection_points[k], poses[r], r)
 
     def isPointInspected(self, viewpoint, inspection_point, pose, robot_index):
-        print("inspection point type: ", inspection_point.type, "robot number ", robot_index+1)
         if inspection_point.type == 't':
             viewpoints_distance = self.viewpoints_t_distance
             dev_xy = np.sqrt((inspection_point.position.x - pose.x)**2 + (inspection_point.position.y - pose.y)**2)
@@ -114,23 +113,18 @@ class Evaluator:
                                                                                inspection_point.position.y,
                                                                                inspection_point.position.z,
                                                                                1.0]))
-            print("Inspection point co-ordinates: ",
-                  inspection_point_transformed)
             theta_xz = math.atan2(inspection_point_transformed[2],
                                   inspection_point_transformed[0])
-            print("theta_xz is ", theta_xz)
             # theta_xz should be greater than -((pi/2)+(vfov/2)) and less than -((pi/2)-(vfov/2))
             # is_in_vfov = (theta_xz > -((math.pi/2)+(self.vertical_aovs[robot_index]/2)) and theta_xz < -((math.pi/2)-(self.vertical_aovs[robot_index]/2)))
             is_in_vfov = abs(theta_xz-(-math.pi/2)
                              ) <= self.vertical_aovs[robot_index]/2
             theta_xy = math.atan2(inspection_point_transformed[2],
                                   inspection_point_transformed[1])
-            print("theta_xy is ", theta_xy)
             # is_in_hfov = (theta_xy > -((math.pi/2)+(self.horizontal_aovs[robot_index]/2)) and theta_xy < -((math.pi/2)-(self.horizontal_aovs[robot_index]/2)))
             is_in_hfov = abs(theta_xy-(-math.pi/2)
                              ) <= self.horizontal_aovs[robot_index]/2
             # theta_xy should be greater than -((pi/2)+(hfov/2)) and less than -((pi/2)-(hfov/2))
-            print("is in hfov: ", is_in_hfov, " is in vfov: ", is_in_vfov, " is at correct altitude: ", is_at_correct_altitude)
             return is_in_hfov and is_in_vfov and is_at_correct_altitude
         else:
             raise Exception(
