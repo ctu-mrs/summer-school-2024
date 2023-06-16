@@ -655,12 +655,14 @@ class ProblemLoader:
                         continue
                     if line.startswith("INSPECTION_POINTS_END"):
                         break
+                    if not line:
+                        continue 
 
                     params = line.split(" ")
                     params = [x for x in params if x != '']
                     if len(params) < 5:
                         return None, str("wrong problem specification (inspection point should contain at least idx x y z heading)")
-
+                    
                     inspection_point = InspectionPoint()
                     inspection_point.idx = int(params[0])
                     inspection_point.position.x = float(params[1])
@@ -668,7 +670,11 @@ class ProblemLoader:
                     inspection_point.position.z = float(params[3])
                     inspection_point.inspect_heading = float(params[4])
                     inspection_point.type = str(params[5])
-                    inspection_point.inspectability = [int(p) for p in params[6:]]
+                    inspection_point.inspectability = []
+                    for p in params[6:]:
+                        if p == '#':
+                            break
+                        inspection_point.inspectability.append(int(p))
 
                     problem.inspection_points.append(inspection_point)
 
