@@ -250,6 +250,10 @@ class Visualizer:
         msg = self.start_points_msg
         self.start_positions_publisher.publish(msg)
         self.start_arrows_publisher.publish(self.start_arrow_msg)
+    
+    def publishStartPositionsWithoutArrows(self):
+        msg = self.start_points_msg
+        self.start_positions_publisher.publish(msg)
 
     def publishObstacles(self):
         msg = self.cloud_msg

@@ -378,8 +378,15 @@ class MrimManager:
                                            uav_names[0], uav_names[1])
             self.rviz_proc = subprocess.Popen(['rviz', '-d', tmp_rviz_config], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             rospy.Rate(0.2).sleep()
+        
+            self.visualizer_.publishSafetyArea()
+            self.visualizer_.publishObstacles()
+            self.visualizer_.publishInspectionPoints(self.evaluator_.inspection_problem.inspection_points, self.evaluator_.viewpoints)
+            self.visualizer_.publishViewPoints(self.evaluator_.inspection_problem.inspection_points, self.evaluator_.viewpoints)
+            self.visualizer_.publishStartPositionsWithoutArrows()
 
         # #} end of INITIALIZATION OF RVIZ VISUALIZER
+        
 
         # #{ TRAJECTORIES SUBSCRIPTION OR LOADING
 
