@@ -99,8 +99,8 @@ class Evaluator:
             return dist_dev <= self.allowed_dist_dev and heading_dev <= self.allowed_heading_dev and pitch_dev <= self.allowed_pitch_dev and is_in_hfov
         elif inspection_point.type == 's':
             viewpoints_distance = self.viewpoints_s_distance
-            is_at_correct_altitude = abs(
-                (pose.z - inspection_point.position.z)-viewpoints_distance) < self.allowed_dist_dev
+            dev_xy = np.sqrt((inspection_point.position.x - pose.x)**2 + (inspection_point.position.y - pose.y)**2)
+            dist_dev = abs(np.sqrt(dev_xy**2 + (inspection_point.position.z - pose.z)**2) - viewpoints_distance)
             # SE3 Matrix = |Rotation, Translation|
             #              |0,        1         |
             Drone_to_World = np.array([
@@ -125,7 +125,7 @@ class Evaluator:
             is_in_hfov = abs(theta_xy-(-math.pi/2)
                              ) <= self.horizontal_aovs[robot_index]/2
             # theta_xy should be greater than -((pi/2)+(hfov/2)) and less than -((pi/2)-(hfov/2))
-            return is_in_hfov and is_in_vfov and is_at_correct_altitude
+            return is_in_hfov and is_in_vfov and dist_dev <= self.allowed_dist_dev
         else:
             raise Exception(
                 f"Type '{inspection_point.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
