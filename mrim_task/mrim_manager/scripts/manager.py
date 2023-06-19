@@ -125,7 +125,7 @@ class Evaluator:
             is_in_hfov = abs(theta_xy-(-math.pi/2)
                              ) <= self.horizontal_aovs[robot_index]/2
             # theta_xy should be greater than -((pi/2)+(hfov/2)) and less than -((pi/2)-(hfov/2))
-            return is_in_hfov and is_in_vfov and dist_dev <= self.allowed_dist_dev
+            return is_in_hfov and is_in_vfov and dist_dev <= self.allowed_dist_dev/2
         else:
             raise Exception(
                 f"Type '{inspection_point.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
