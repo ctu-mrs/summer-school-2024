@@ -32,7 +32,8 @@ class MrimPlanner:
             exit(-1)
 
         ## |  load parameters from ROS custom config (mrim_task/mrim_planner/config/custom_config.yaml)  |
-        self._viewpoints_distance      = rospy.get_param('~viewpoints/distance', 3.0)
+        self._viewpoints_t_distance      = rospy.get_param('~viewpoints/t_distance', 3.0)
+        self._viewpoints_s_distance      = rospy.get_param('~viewpoints/s_distance', 3.0)
         self._plot                     = rospy.get_param('~problem/plot', False)
         self._trajectory_dt            = rospy.get_param('~trajectories/dt', 0.2)
         self._smoothing_sampling_step  = rospy.get_param('~path_smoothing/sampling_step', 0.1)
@@ -150,7 +151,15 @@ class MrimPlanner:
             for ip in problem.inspection_points:
 
                 # convert IP to VP [id x y z heading]
-                viewpoint = inspectionPointToViewPoint(ip, self._viewpoints_distance)
+                if ip.type == 't':
+                    # inspection point on tower
+                    viewpoint = inspectionPointToViewPoint(ip, self._viewpoints_t_distance)
+                elif ip.type == 's':
+                    # inspection point on solar panel
+                    viewpoint = inspectionPointToViewPoint(ip, self._viewpoints_s_distance)
+                else:
+                    raise Exception(f"Type '{ip.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
+
 
                 # if inspectability of IP is unique for robot with this ID, add it
                 if len(ip.inspectability) == 1 and robot_id in ip.inspectability:
@@ -172,7 +181,8 @@ class MrimPlanner:
                 print('   [{:d}]:'.format(vp.idx), vp.pose)
 
         # add VPs to offline visualization
-        plotter.addViewPoints(viewpoints, self._viewpoints_distance)
+        plotter.addViewPoints(viewpoints, self._viewpoints_t_distance, self._viewpoints_s_distance)
+
         # # #}
 
         # Print out if the viewpoints collide with the environment

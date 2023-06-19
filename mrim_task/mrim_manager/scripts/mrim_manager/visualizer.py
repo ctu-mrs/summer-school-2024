@@ -223,9 +223,17 @@ class Visualizer:
         self.collisions_publisher.publish(msg)
 
     def publishCone(self, pose, trajectory_idx):
-        cone = self.fov1 if trajectory_idx == 1 else self.fov2
-        cone.pose = pose
-        self.cone_publishers[trajectory_idx].publish(cone)
+        if(trajectory_idx == 1):
+            cone = self.fov1
+            cone.pose = pose
+            self.cone_publishers[trajectory_idx].publish(cone)
+        else:
+            cone = self.fov2_rgb
+            cone.pose = pose
+            self.cone_publishers[trajectory_idx].publish(cone)
+            cone = self.fov2_thermal
+            cone.pose = pose
+            self.cone_publishers[trajectory_idx].publish(cone)
 
     def publishOdometry(self, odom, trajectory_idx):
         self.odometry_publishers[trajectory_idx].publish(odom)
@@ -242,6 +250,10 @@ class Visualizer:
         msg = self.start_points_msg
         self.start_positions_publisher.publish(msg)
         self.start_arrows_publisher.publish(self.start_arrow_msg)
+    
+    def publishStartPositionsWithoutArrows(self):
+        msg = self.start_points_msg
+        self.start_positions_publisher.publish(msg)
 
     def publishObstacles(self):
         msg = self.cloud_msg
@@ -254,10 +266,11 @@ class Visualizer:
         self.safety_area_publisher.publish(msg)
 
     def setFov1(self, fov_length, aov_h, aov_v, x_scale, red, green, blue):
-        self.fov1 = self.createConeMsg(fov_length, aov_h, aov_v, x_scale, red, green, blue, 1)
+        self.fov1 = self.createConeMsg(fov_length, aov_h, aov_v, x_scale, red, green, blue, 1, "RGB")
 
     def setFov2(self, fov_length, aov_h, aov_v, x_scale, red, green, blue):
-        self.fov2 = self.createConeMsg(fov_length, aov_h, aov_v, x_scale, red, green, blue, 2)
+        self.fov2_rgb = self.createConeMsg(fov_length, aov_h, aov_v, x_scale, red, green, blue, 2, "RGB")
+        self.fov2_thermal = self.createConeMsg(fov_length, aov_h, aov_v, x_scale, red, green, blue, 2, "Thermal")
 
     def createCloudMessage(self, inspection_problem):
         header = std_msgs.msg.Header()
@@ -267,7 +280,7 @@ class Visualizer:
         pcl_msg = sensor_msgs.point_cloud2.create_cloud_xyz32(header, cloud_points)
         return pcl_msg
 
-    def createConeMsg(self, fov_length, aov_h, aov_v, x_scale, red, green, blue, marker_id):
+    def createConeMsg(self, fov_length, aov_h, aov_v, x_scale, red, green, blue, marker_id, camera_type):
         marker = Marker()
         marker.header.frame_id = self.frame
         marker.header.stamp    = rospy.Time.now()
@@ -307,12 +320,21 @@ class Visualizer:
         points.append([x, -y, z]);
         points.append([x, y, z]);
 
-        for k in range(len(points)):
-            pt = Point()
-            pt.x = points[k][2]
-            pt.y = points[k][1]
-            pt.z = points[k][0]
-            marker.points.append(pt)
+        if(camera_type == "RGB" or camera_type == "rgb"):
+            for k in range(len(points)):
+                pt = Point()
+                pt.x = points[k][2]
+                pt.y = points[k][1]
+                pt.z = points[k][0]
+                marker.points.append(pt)
+        else:
+            for k in range(len(points)):
+                pt = Point()
+                pt.x = points[k][0]
+                pt.y = points[k][1]
+                pt.z = -points[k][2]
+                marker.points.append(pt)
+            marker.id = 0
 
         return marker
 

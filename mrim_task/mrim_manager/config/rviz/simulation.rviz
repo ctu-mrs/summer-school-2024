@@ -28,7 +28,7 @@ Panels:
     SyncSource: Obstacles
   - Class: jsk_rviz_plugin/PublishTopic
     Name: PublishTopic
-    Topic: /pause_playback
+    Topic: /pause_or_replay_playback
   - Class: jsk_rviz_plugin/YesNoButton
     Name: YesNoButton
 Preferences:

@@ -6,7 +6,7 @@
       <collision name="collision">
         <geometry>
           <mesh>
-            <scale>0.1 0.1 0.1</scale>
+            <scale>1.0 1.0 1.0</scale>
             <uri>model://single_tower/meshes/single_tower.dae</uri>
           </mesh>
         </geometry>
@@ -14,7 +14,7 @@
       <visual name="visual">
         <geometry>
           <mesh>
-            <scale>0.1 0.1 0.1</scale>
+            <scale>1.0 1.0 1.0</scale>
             <uri>model://single_tower/meshes/single_tower.dae</uri>
           </mesh>
         </geometry>

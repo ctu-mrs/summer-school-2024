@@ -68,9 +68,9 @@ class TSPSolver3D():
             min_z = problem.min_height
             max_z = problem.max_height
 
-            dim_x = int(np.ceil((max_x - min_x) / path_planner['astar/grid_resolution']))+1
-            dim_y = int(np.ceil((max_y - min_y) / path_planner['astar/grid_resolution']))+1
-            dim_z = int(np.ceil((max_z - min_z) / path_planner['astar/grid_resolution']))+1
+            dim_x = int(np.floor((max_x - min_x) / path_planner['astar/grid_resolution']))+1
+            dim_y = int(np.floor((max_y - min_y) / path_planner['astar/grid_resolution']))+1
+            dim_z = int(np.floor((max_z - min_z) / path_planner['astar/grid_resolution']))+1
 
             path_planner['grid'] = Grid3D(idx_zero = (min_x, min_y,min_z), dimensions=(dim_x,dim_y,dim_z), resolution_xyz=path_planner['astar/grid_resolution'])
             path_planner['grid'].setObstacles(problem.obstacle_points, path_planner['safety_distance'])

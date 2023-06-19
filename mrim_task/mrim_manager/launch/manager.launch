@@ -48,7 +48,7 @@
     <remap from="uav_state_1_in"        to="/$(arg UAV_NAME_1)/odometry/uav_state" />
     <remap from="uav_state_2_in"        to="/$(arg UAV_NAME_2)/odometry/uav_state" />
     <remap from="inspection_problem_in" to="/mrim_planner/problem" />
-    <remap from="pause_playback_in"     to="/pause_playback" />
+    <remap from="pause_playback_in"     to="/pause_or_replay_playback" />
 
     # Remap publishers
     <remap from="inspection_points_out" to="/visualization/inspection_points" />
