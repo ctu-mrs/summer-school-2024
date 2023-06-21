@@ -123,7 +123,7 @@ Your solution to both the challenges has to conform to constraints summarized in
 \* The last point of the trajectory is expected to match the starting point with up to 1 m tolerance.
 
 ## Where to code changes
-Change your code within directory `summer-school-2023/mrim_task/mrim_planner` (<span style="color:red">changes in other folders(`mrim_manager,mrim_resources, mrim_state_machine`) will not be applied during competition/evaluation</span>) in files:
+Change your code within directory `summer-school-2023/mrim_task/mrim_planner` $\textcolor{red}{(changes in other folders(`mrim_manager,mrim_resources, mrim_state_machine`) will not be applied during competition/evaluation})$ in files:
 
 * `scripts/`
   * `planner.py`: Crossroad script where the path to your solution begins. Here you will find initial ideas and examples on how to load parameters.
