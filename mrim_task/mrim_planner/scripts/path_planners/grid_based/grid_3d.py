@@ -127,6 +127,7 @@ class Grid3D():
         ix = np.round((x - self.idx_zero[0]) / self.resolution_xyz).astype(np.int)
         iy = np.round((y - self.idx_zero[1]) / self.resolution_xyz).astype(np.int)
         iz = np.round((z - self.idx_zero[2]) / self.resolution_xyz).astype(np.int)
+        iz = 0 if iz < 0 else iz
         return (ix, iy, iz)
     # # #}
 
