@@ -456,7 +456,7 @@ class TrajectoryUtils():
             # STUDENTS TODO: Sample the path parametrization 'toppra_trajectory' (instance of TOPPRA library).
             raise NotImplementedError('[STUDENTS TODO] Trajectory sampling not finished. You have to implement it on your own.')
             # Tips:
-            #  - check documentation for TOPPRA (look for eval() function): https://hungpham2511.github.io/toppra/index.html
+            #  - check code examples for TOPPRA (look for eval() function): https://hungpham2511.github.io/toppra/index.html
             #  - use 'toppra_trajectory' and the predefined sampling step 'sampling_step'
 
             samples = [] # [STUDENTS TODO] Fill this variable with trajectory samples
