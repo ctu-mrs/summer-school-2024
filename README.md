@@ -132,9 +132,9 @@ Change your code within directory `summer-school-2023/mrim_task/mrim_planner` (c
     * `tsp_solvers.py`: This is where VPs assignment for TSP, path planning, and solving TSP happens. Here you can play with an efficient assignment of VPs to UAVs or study the effect of path planners on TSP solution performance.
     * `utils.py`: Default source of various utility functions. Feel free to add your own.
   * `path_planners/grid_based`
-    * `astar.py`: Implementation of A^* path planner. Here you can finished the algorithm using proper heuristic function and add path straightening functionality.
+    * `astar.py`: Implementation of A* path planner. Here you can finished the algorithm using proper heuristic function and add path straightening functionality.
   * `path_planners/sampling_based`
-    * `rrt.py`: Implementation of RRT path planner. Here you can upgrade the planner to RRT^*, implement a better sampling method and add path straightening functionality.
+    * `rrt.py`: Implementation of RRT path planner. Here you can upgrade the planner to RRT*, implement a better sampling method and add path straightening functionality.
   * `config/`
     * `virtual.yaml` and `real_world.yaml`: Config files (for two challenges described below) containing various parameters/switches for the task. If you need other parameters, add them here, load them in `scripts/planner.py` and use them in the code accordingly.
 
