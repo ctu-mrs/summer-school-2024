@@ -21,7 +21,7 @@ A set of scripts is provided to create a layer of abstraction above the Singular
 The following steps will download the main repository, install Singularity (only on Ubuntu-compatible OS), and download the pre-built Singularity image.
 No further changes are made to the host operating system.
 
-Requirements: Linux OS, approx. 5 GB of HDD space.
+Requirements: Linux OS, approx. 6.5 GB of HDD space.\
 For a non-Ubuntu OS, please, install the Singularity on your own.
 
 1. If you are a `git` veteran, you should `fork` the git repository [github.com/ctu-mrs/summer-school-2023](https://github.com/ctu-mrs/summer-school-2023). This will allow you to store changes to our code. Do not forget to make your fork private unless you want other participants to be able to peek into your code.
@@ -123,7 +123,7 @@ Your solution to both the challenges has to conform to constraints summarized in
 \* The last point of the trajectory is expected to match the starting point with up to 1 m tolerance.
 
 ## Where to code changes
-Change your code within directory `summer-school-2023/mrim_task/mrim_planner` (changes in other folders(`mrim_manager,mrim_resources, mrim_state_machine`) will not be applied during competition/evaluation}) in files:
+Change your code within directory `summer-school-2023/mrim_task/mrim_planner` (changes in other folders(`mrim_manager,mrim_resources, mrim_state_machine`) will not be applied during competition/evaluation) in files:
 
 * `scripts/`
   * `planner.py`: Crossroad script where the path to your solution begins. Here you will find initial ideas and examples on how to load parameters.
@@ -131,6 +131,10 @@ Change your code within directory `summer-school-2023/mrim_task/mrim_planner` (c
   * `solvers/`
     * `tsp_solvers.py`: This is where VPs assignment for TSP, path planning, and solving TSP happens. Here you can play with an efficient assignment of VPs to UAVs or study the effect of path planners on TSP solution performance.
     * `utils.py`: Default source of various utility functions. Feel free to add your own.
+  * `path_planners/grid_based`
+    * `astar.py`: Implementation of A* path planner. Here you can finished the planner using proper heuristic function and add path straightening functionality.
+  * `path_planners/sampling_based`
+    * `rrt.py`: Implementation of RRT path planner. Here you can upgrade the planner to RRT*, implement a better sampling method and add path straightening functionality.
   * `config/`
     * `virtual.yaml` and `real_world.yaml`: Config files (for two challenges described below) containing various parameters/switches for the task. If you need other parameters, add them here, load them in `scripts/planner.py` and use them in the code accordingly.
 
