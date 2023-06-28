@@ -23,6 +23,17 @@ class MrimPlanner:
 
         ## | ---------------------- load problem ---------------------- |
         problem_filename = rospy.get_param('~problem/name')
+        session_problem = rospy.get_param('~session_problem')
+        if(session_problem != 'offline'):
+            log_msg = "Session.yml problem name doesn't match the virtual.yaml name, check ReadMe."
+            if((problem_filename == 'four_towers_large.problem' or problem_filename == 'four_towers_small.problem') and session_problem != "four_towers"):
+                rospy.logerr(log_msg)
+                rospy.signal_shutdown(log_msg)
+                exit(-1)
+            elif(problem_filename == 'single_tower.problem' and session_problem != "single_tower"):
+                rospy.logerr(log_msg)
+                rospy.signal_shutdown(log_msg)
+                exit(-1)
         problem_filepath = rospkg.RosPack().get_path('mrim_resources') + "/problems/" + problem_filename
         problem, log_msg = ProblemLoader().loadProblem(problem_filepath)
 

@@ -37,7 +37,7 @@ windows:
   - planner:
       layout: even-vertical
       panes:
-        - export UAV_NAME=uav1; waitForOdometry; roslaunch mrim_planner planner.launch RUN_TYPE:=simulation
+      - export UAV_NAME=uav1; waitForOdometry; roslaunch mrim_planner planner.launch RUN_TYPE:=simulation SESSION_PROBLEM:=$PROBLEM
   - start_planning:
       layout: even-vertical
       synchronize: after

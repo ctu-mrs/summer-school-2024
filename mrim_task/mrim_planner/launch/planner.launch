@@ -2,6 +2,7 @@
 
   <arg name="RUN_TYPE" default="offline"/>
   <arg name="RVIZ_GUI" default="1" />
+  <arg name="SESSION_PROBLEM" default="" />
 
   <!-- DO NOT CHANGE BELOW -->
 
@@ -15,6 +16,8 @@
               file="$(find mrim_planner)/config/virtual.yaml" command="load" />
     <rosparam if="$(eval arg('RUN_TYPE') == 'uav')"
               file="$(find mrim_planner)/config/real_world.yaml" command="load" />
+    <param name="session_problem" value="$(arg SESSION_PROBLEM)" />
+
 
     <!-- Remap publishers -->
     <remap from="~problem_out"      to="~problem" />
