@@ -21,7 +21,7 @@ A set of scripts is provided to create a layer of abstraction above the Singular
 The following steps will download the main repository, install Singularity (only on Ubuntu-compatible OS), and download the pre-built Singularity image.
 No further changes are made to the host operating system.
 
-Requirements: Linux OS, approx. 6.5 GB of HDD space.
+Requirements: Linux OS, approx. 6.5 GB of HDD space.\
 For a non-Ubuntu OS, please, install the Singularity on your own.
 
 1. If you are a `git` veteran, you should `fork` the git repository [github.com/ctu-mrs/summer-school-2023](https://github.com/ctu-mrs/summer-school-2023). This will allow you to store changes to our code. Do not forget to make your fork private unless you want other participants to be able to peek into your code.
