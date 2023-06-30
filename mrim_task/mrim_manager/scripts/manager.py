@@ -127,7 +127,7 @@ class Evaluator:
             # theta_xy should be greater than -((pi/2)+(hfov/2)) and less than -((pi/2)-(hfov/2))
             
             heading_dev = abs(wrapAngle(pose.heading - viewpoint.heading))
-            return is_in_hfov and is_in_vfov and dist_dev <= self.allowed_dist_dev/2 and heading_dev <= self.allowed_heading_dev
+            return is_in_hfov and is_in_vfov and dist_dev <= self.allowed_dist_dev and heading_dev <= self.allowed_heading_dev
         else:
             raise Exception(
                 f"Type '{inspection_point.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
