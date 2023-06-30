@@ -449,7 +449,7 @@ class MrimManager:
 
         dynamic_constraints_ok_list = self.checkDynamicConstraints(self.trajectories, self.constraints)
 
-        safety_area_ok_list = self.checkSafetyArea(self.trajectories, False, minimum_height, maximum_height)
+        safety_area_ok_list, safety_area_ok_list_in_time = self.checkSafetyArea(self.trajectories, False, minimum_height, maximum_height)
 
         overall_status = True
 
@@ -529,7 +529,7 @@ class MrimManager:
                 self.visualizer_.publishPaths(self.trajectories)
                 self.visualizer_.publishCollisions(self.trajectories, collisions_between_uavs)
                 self.runOfflineTrajectoryPlayback(self.trajectories, odometry_publishers, playback_speed, trajectory_dt, uav_obstacle_distances,\
-                                           mutual_distances, minimum_obstacle_distance, minimum_mutual_distance)
+                                           mutual_distances, minimum_obstacle_distance, minimum_mutual_distance, safety_area_ok_list_in_time)
                 self.evaluator_.resetScore()
                 rate.sleep()
 
@@ -752,6 +752,7 @@ class MrimManager:
 
     def checkSafetyArea(self, trajectories, safety_area, minimum_height, maximum_height):
         results = []
+        results_in_time = []
         ok_min, ok_max = True, True
         mins, maxs = [], []
 
@@ -761,6 +762,8 @@ class MrimManager:
             # rospy.loginfo("[MrimManager] ---------- Min and max height check for trajectory %s: ----------", trajectories[k].trajectory_name)
 
             z_list = [pose.z for pose in trajectories[k].poses]
+
+            results_in_time_k = (np.array(z_list) > minimum_height) * (np.array(z_list) < maximum_height)
 
             z_min = min(np.array(z_list))
             z_max = max(np.array(z_list))
@@ -787,6 +790,7 @@ class MrimManager:
                 result = False
 
             results.append(result)
+            results_in_time.append(results_in_time_k)
 
             if self.print_info:
                 rospy.loginfo("[MrimManager] Height limits of trajectory %s:", trajectories[k].trajectory_name)
@@ -795,9 +799,12 @@ class MrimManager:
         rospy.loginfo("[MrimManager] [{:s}] Min/max height:".format(boolToString(ok_min and ok_max)))
         for k in range(len(trajectories)):
             ok = results[k]
-            rospy.loginfo("[MrimManager]    - [{:s}] {:s}: min|max = {:.2f}|{:.2f} (limit: {:.2f}|{:.2f}) m".format(boolToString(ok), self.trajectories[k].trajectory_name, mins[k], maxs[k], minimum_height, maximum_height))
+            if ok:
+                rospy.loginfo("[MrimManager]    - [{:s}] {:s}: min|max = {:.2f}|{:.2f} (limit: {:.2f}|{:.2f}) m".format(boolToString(ok), self.trajectories[k].trajectory_name, mins[k], maxs[k], minimum_height, maximum_height))
+            else: 
+                rospy.loginfo("[MrimManager]    - [{:s}] {:s}: min|max = {:.10f}|{:.10f} (limit: {:.10f}|{:.10f}) m".format(boolToString(ok), self.trajectories[k].trajectory_name, mins[k], maxs[k], minimum_height, maximum_height))
 
-        return results
+        return results, results_in_time
 
     # #} end of checkSafetyArea()
 
@@ -960,7 +967,7 @@ class MrimManager:
 
     # #{ runOfflineTrajectoryPlayback()
 
-    def runOfflineTrajectoryPlayback(self, trajectories, odometry_publishers, playback_speed, dt, obstacle_dists, mutual_dists, min_obst_dist, min_mutual_dist):
+    def runOfflineTrajectoryPlayback(self, trajectories, odometry_publishers, playback_speed, dt, obstacle_dists, mutual_dists, min_obst_dist, min_mutual_dist, safety_area_check):
         rospy.loginfo_once("[MrimManager] Running trajectory playback.")
         playback_rate = rospy.Rate(playback_speed/dt)
         max_len = max(np.array([len(trajectory.poses) for trajectory in trajectories]))
@@ -977,7 +984,7 @@ class MrimManager:
         while trajectory_idx < max_len:
             if not self.playback_paused:
                 self.visualizer_.publishFullScreenMsg("")
-                self.publishPlaybackOffline(trajectories, trajectory_idx, obstacle_dists, mutual_dists, min_obst_dist, min_mutual_dist)
+                self.publishPlaybackOffline(trajectories, trajectory_idx, obstacle_dists, mutual_dists, min_obst_dist, min_mutual_dist, safety_area_check)
                 trajectory_idx += 1
 
             playback_rate.sleep()
@@ -1056,7 +1063,7 @@ class MrimManager:
 
     # #{ publishPlaybackOffline()
 
-    def publishPlaybackOffline(self, trajectories, trajectory_idx, obstacle_dists, mutual_dists, min_obst_dist, min_mutual_dist):
+    def publishPlaybackOffline(self, trajectories, trajectory_idx, obstacle_dists, mutual_dists, min_obst_dist, min_mutual_dist, safety_area_check):
 
         poses = []
         for k in range(len(trajectories)):
@@ -1081,6 +1088,13 @@ class MrimManager:
                 self.evaluator_.setZeroScore()
                 with self.diag_msg_lock:
                     msg = "Minimum mutual distance violated!"
+                    if not msg in self.diag_msgs:
+                        self.diag_msgs.append(msg)
+            
+            if not safety_area_check[k][t_idx]:
+                self.evaluator_.setZeroScore()
+                with self.diag_msg_lock:
+                    msg = "Safety area violated!"
                     if not msg in self.diag_msgs:
                         self.diag_msgs.append(msg)
 
@@ -1122,7 +1136,7 @@ class MrimManager:
                     msg = "Minimum mutual distance violated!"
                     if not msg in self.diag_msgs:
                         self.diag_msgs.append(msg)
-
+            
         if not self.mission_time_exceeded and mission_time > self.mission_time_limit:
             with self.diag_msg_lock:
                 self.diag_msgs.append("-- Mission time limit exceeded! --")
