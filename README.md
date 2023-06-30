@@ -29,7 +29,7 @@ For a non-Ubuntu OS, please, install the Singularity on your own.
 2. Clone your new repository to `~/git`:
 ```bash
 mkdir -p ${HOME}/git
-cd ${HOME}/git && git clone <your new repository>
+cd ${HOME}/git && git clone <your new repository's link>
 ```
 
 3. **(on your personal computers only)** Run the installation script that will install dependencies, download the MRS singularity image containing [MRS UAV System](https://github.com/ctu-mrs/mrs_uav_system), and compile the workspace:
