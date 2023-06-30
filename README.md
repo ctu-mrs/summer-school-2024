@@ -26,10 +26,10 @@ For a non-Ubuntu OS, please, install the Singularity on your own.
 
 1. If you are a `git` veteran, you would think about `fork`-ing the repository, but because you are a veteran, you will know that a fork of a public repository cannot be made private and you don't want your team's solutions to be public. So, we recommend to tap the plus sign in the top right corner, and then select the Import repository option. Add `https://github.com/ctu-mrs/summer-school-2023.git` as the link and while completing this form/page, you will find an option to make your new repository private.  
 
-2. Clone this repository to `~/git`:
+2. Clone your new repository to `~/git`:
 ```bash
 mkdir -p ${HOME}/git
-cd ${HOME}/git && git clone https://github.com/ctu-mrs/summer-school-2023.git
+cd ${HOME}/git && git clone <your new repository>
 ```
 
 3. **(on your personal computers only)** Run the installation script that will install dependencies, download the MRS singularity image containing [MRS UAV System](https://github.com/ctu-mrs/mrs_uav_system), and compile the workspace:
