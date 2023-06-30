@@ -24,13 +24,12 @@ No further changes are made to the host operating system.
 Requirements: Linux OS, approx. 6.5 GB of HDD space.\
 For a non-Ubuntu OS, please, install the Singularity on your own.
 
-1. If you are a `git` veteran, you should `fork` the git repository [github.com/ctu-mrs/summer-school-2023](https://github.com/ctu-mrs/summer-school-2023). This will allow you to store changes to our code. Do not forget to make your fork private unless you want other participants to be able to peek into your code.
-**UPDATE:** Forked repositories on github cannot be made private. Workaround: Instead of forking the repository, click the plus sign in the top right corner, select Import repository, type in the original repo address `https://github.com/ctu-mrs/summer-school-2023.git` and then the name of your new repository. In the bottom part of the form, you can select Private. 
+1. If you are a `git` veteran, you would think about `fork`-ing the repository, but because you are a veteran, you will know that a fork of a public repository cannot be made private and you don't want your team's solutions to be public. So, we recommend to tap the plus sign in the top right corner, and then select the Import repository option. Add `https://github.com/ctu-mrs/summer-school-2023.git` as the link and while completing this form/page, you will find an option to make your new repository private.  
 
-2. Clone the repository to `~/git`:
+2. Clone your new repository to `~/git`:
 ```bash
 mkdir -p ${HOME}/git
-cd ${HOME}/git && git clone https://github.com/ctu-mrs/summer-school-2023.git
+cd ${HOME}/git && git clone <your new repository's link>
 ```
 
 3. **(on your personal computers only)** Run the installation script that will install dependencies, download the MRS singularity image containing [MRS UAV System](https://github.com/ctu-mrs/mrs_uav_system), and compile the workspace:
@@ -180,7 +179,7 @@ The RViz (ROS visualization) shows an **example solution** to the task.
 
 The RViz window contains:
 
-* start/pause button in the left bottom corner
+* Start/pause button in the left bottom corner. **(Use Send Topic button and not the Rviz pause button)**
 * overall trajectories information in the top left/right corners (background is green if every check is OK, red otherwise)
 * current flight statistics right below
 * information about the mission and the score centered in the top
@@ -202,7 +201,7 @@ To change the world to `four_towers`, you have to
 
   * change the parameter `problem/name` in the `mrim_task/mrim_planner/config/virtual.yaml` to one of the `four_towers` problems (see section [Testing](https://github.com/ctu-mrs/summer-school-2023#testing)) and
   * change variable `PROBLEM` in `simulation/tmux_scripts/simulation/session.yml` from `export PROBLEM=single_tower` to `export PROBLEM=four_towers`.
-* **Gazebo GUI:** The GUI of Gazebo simulator is disabled by default to not stress-out your system. You can enable it by changing the variable `GUI` in `simulation/tmux_scripts/simulation/session.yml` from `export GUI=false` to `export GUI=true`.
+* **Gazebo GUI:** The GUI of Gazebo simulator is disabled by default to not stress-out your system. You can enable it by changing the variable `GUI` in `simulation/tmux_scripts/simulation/session.yml` from `export GUI=false` to `export GUI=true`. You can also use the pause button in the corner to pause the simulation.
 
 You may notice that your terminal opened multiple tabs.
 Check the first page of the [MRS Cheatsheet](https://github.com/ctu-mrs/mrs_cheatsheet) if you need help navigating the tabs and panes.
@@ -250,11 +249,11 @@ Please, **email us** the code to `guptapar@fel.cvut.cz` with the subject **SUMME
 ```bash
 zip -r my_team_name.zip mrim_planner
 ```
-The submitted archive has to contain the whole package `mrim_planner`, including two config files (`real_world.yaml` and `virtual.yaml`) in the folder `mrim_planner/config`.
+The submitted archive has to contain the whole package `mrim_planner`, including two config files (`real_world.yaml` and `virtual.yaml`) in the folder `mrim_planner/config`. **Please don't forget to copy the parameters from `virtual.yaml` to `real_world.yaml`.**
 Please include the names of all team members in the email message.
 **The late submissions will not be accepted for the competition**.
 
-The evaluation of particular solutions in the real-world challenge will be performed on Friday, August 5th, with the real-time score presentation.
+The evaluation of particular solutions in the real-world challenge will be performed on Friday, July 7th, with the real-time score presentation.
 The virtual challenge will be evaluated on Friday.
 The results will be presented during an awards ceremony organized at the experimental site after the real-world challenge.
 **The final score of the solution equals the sum of successfully inspected IPs.**
