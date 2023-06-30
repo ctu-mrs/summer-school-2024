@@ -108,7 +108,7 @@ class TSPSolver3D():
                 # [STUDENTS TODO]
                 #   - Play with distance estimates in TSP (tsp/distance_estimates parameter in config) and see how it influences the solution
                 #   - You will probably see that computing for all poses from both sets takes a long time.
-                #   - Think if you can limit the number of computations or decide which distance-estimating method use for each point-pair.
+                #   - Think if you can reduce the number of computations.
 
                 # get poses of the viewpoints
                 g1 = viewpoints[a].pose
@@ -273,7 +273,7 @@ class TSPSolver3D():
             # Tips:
             #  - utilize sklearn.cluster.KMeans implementation (https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html)
             #  - after finding the labels, you may want to swap the classes (e.g., by looking at the distance of the UAVs from the cluster centers)
-            #  - Find the start poses of the UAVs in problem.start_poses
+            #  - Find the start poses of the UAVs in problem.start_poses.position.{x,y,z}
 
             # TODO: fill 1D list 'labels' of size len(viewpoints) with indices of the robots
             labels = [randint(0, k - 1) for vp in viewpoints]
