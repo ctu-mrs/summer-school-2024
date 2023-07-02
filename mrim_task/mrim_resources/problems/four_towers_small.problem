@@ -3,8 +3,8 @@ COMMENT: Small four towers problem for MRS UAV Summer School 2023
 
 # ID X Y Z HEADING
 ROBOTS_START
-1 -5.0 10.0 0.75 1.57
-2 15.0 10.0 0.75 1.57
+1 -5.0 10.0 0.75 -1.57
+2 15.0 10.0 0.75 -1.57
 ROBOTS_END
 
 # TODO: design inspection points
