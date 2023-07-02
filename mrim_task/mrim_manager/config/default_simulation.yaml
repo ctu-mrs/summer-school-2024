@@ -37,11 +37,13 @@ trajectories:
     mutual: 2.7 # (m)
     obstacles: 1.9 # (m)
 
-  # UNUSED
   subscribe: True
+  
+  # If you want to load trajectories from files, set parameter subscribe above to False and 
+  # specify folder and names of trajectory files
   loading:
-    folder: "/home/vit/git/mrs_camp_april2022/power_line_mockup_lausanne/trajectories"
-    files:  ["trajectory_rotated_uav1.csv", "trajectory_rotated_uav47.csv", "trajectory_rotated_uav83.csv", "trajectory_rotated_uav7.csv"]
+    folder: "path_to_folder_where_trajectories_are_stored"
+    files:  ["trajectory_uav1.csv", "trajectory_uav2.csv"]
 
 # Viewpoints specifications
 viewpoints:
