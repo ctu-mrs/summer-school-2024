@@ -874,7 +874,7 @@ class MrimManager:
 
         rospy.loginfo("[MrimManager] [{:s}] Minimum UAV-to-obstacle distance:".format(boolToString(ok)))
         for k in range(len(dists_list)):
-            rospy.loginfo("[MrimManager]    - [{:s}] {:s}: {:.2f} m".format(boolToString(ok), self.trajectories[k].trajectory_name, dists[k]))
+            rospy.loginfo("[MrimManager]    - [{:s}] {:s}: {:.2f} m".format(boolToString(result[k]), self.trajectories[k].trajectory_name, dists[k]))
 
         return result
 
