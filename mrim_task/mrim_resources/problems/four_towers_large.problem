@@ -7,7 +7,6 @@ ROBOTS_START
 2 15.0 10.0 0.75 -1.57
 ROBOTS_END
 
-# TODO: design inspection points
 # ID X Y Z HEADING INSPECTABILITY
 INSPECTION_POINTS_START
 # first tower
@@ -16,26 +15,23 @@ INSPECTION_POINTS_START
 3 6.163 4.426 7.253 1.57 t 1 2 # top 
 4 4.857 4.283 5.125 3.14 t 1 2 # left
 5 7.585 4.549 5.098 1.30 t 1 2 # right
-# # 44 6.199 4.555 1.511 1.57 t 1 2 # bottom
 
-# # connections of 1st and 2nd tower
+# connections of 1st and 2nd tower
 6 6.176 2.239 7.146 3.14 t 1 2 # top 
 7 4.948 2.406 5.106 3.14 t 1 2 # left
 8 7.501 2.323 5.084 0.0 t 1 2 # right
 
-# # second tower
-# # 9 6.197 0.2231 4.669 2.34 t 1 2 # cross
+# second tower
 9 6.181 0.086 7.279 2.9 t 1 2 # top 
 10 4.864 0.103 5.132 3.14 t 1 2 # left
 11 7.61 0.075 5.099 0.0 t 1 2 # right
-# # 12 6.194 0.223 1.511 2.34 t 1 2 # bottom
 
-# # connections of 2nd and 3rd tower
+# connections of 2nd and 3rd tower
 12 2.191 -2.852 7.147 2.34 t 1 2 # top 
 13 1.899 -1.943 5.104 2.34 t 1 2 # left
 14 2.939 -3.472 5.094 -0.77 t 2 # right
 
-# # third tower
+# third tower
 15 -1.527 -5.355 4.675 1.57 t 1 # cross
 16 -1.598 -5.502 7.253 2.9 t 1 2 # top 
 17 -2.801 -4.981 5.142 3.14 t 1 2 # left
@@ -43,19 +39,18 @@ INSPECTION_POINTS_START
 19 -1.606 -5.341 1.511 1.57 t 2 # bottom
 20 -1.606 -5.341 1.511 -2.3 t 1 2 # bottom
 
-# # connections of 3rd and 4th tower
+# connections of 3rd and 4th tower
 21 -1.461 -9.111 7.147 0.0 t 1 2 # top 
 22 -2.667 -9.106 5.081 3.14 t 1 2 # left
 23 -0.254 -8.968 5.104 0.0 t 1 2 # right
 
-# # fourth tower
+# fourth tower
 24 -1.419 -12.98 4.64 -1.57 t 2 # cross
 25 -1.438 -12.83 7.253 2.9 t 1 2 # top 
 26 -2.699 -13.17 5.135 3.14 t 1 2 # left
 27 -0.05 -12.46 5.13 0.0 t 1 2 # right
-# # 29 -1.427 -12.98 1.511 -1.57 t 1 # bottom
 
-# # solar panels
+# solar panels
 28 5.844 -5.515 1.0 1.57 s 1
 29 9.95 -7.27 1.0 0.00 s 1
 30 5.811 -9.102 1.0 1.57 s 1
