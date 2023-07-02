@@ -5,6 +5,7 @@ MY_PATH=`dirname "$0"`
 MY_PATH=`( cd "$MY_PATH" && pwd )`
 cd $MY_PATH
 
+SESSION_NAME=simulation
 if [ -z ${TMUX} ];
 then
     TMUX= $TMUX_BIN new-session -s "$SESSION_NAME" -d
