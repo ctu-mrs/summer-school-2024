@@ -80,7 +80,7 @@ class MrimPlanner:
         de_method = self._path_planner['distance_estimation_method']
         if pp_method == 'astar' or de_method == 'astar':
             self._path_planner['astar/grid_resolution'] = rospy.get_param('~path_planner/astar/grid_resolution')
-        elif pp_method.startswith('rrt') or de_method.startswith('rrt'):
+        if pp_method.startswith('rrt') or de_method.startswith('rrt'):
             self._path_planner['rrt/branch_size']      = rospy.get_param('~path_planner/rrt/branch_size')
             self._path_planner['rrt/sampling/method']  = rospy.get_param('~path_planner/rrt/sampling/method')
             self._path_planner['rrtstar/neighborhood'] = None
