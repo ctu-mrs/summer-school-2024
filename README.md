@@ -122,7 +122,7 @@ Your solution to both the challenges has to conform to constraints summarized in
 \* The last point of the trajectory is expected to match the starting point with up to 1 m tolerance.
 
 ## Where to code changes
-Change your code within directory `summer-school-2023/mrim_task/mrim_planner` (changes in other folders(`mrim_manager,mrim_resources, mrim_state_machine`) will not be applied during competition/evaluation) in files:
+Change your code within directory `summer-school-2023/mrim_task/mrim_planner` (changes in other folders (`mrim_manager,mrim_resources, mrim_state_machine`) will not be applied during competition/evaluation) in files:
 
 * `scripts/`
   * `planner.py`: Crossroad script where the path to your solution begins. Here you will find initial ideas and examples on how to load parameters.
@@ -235,7 +235,7 @@ The problems are located in `mrim_resources/problems`: you can switch between th
 
   1. `single_tower.problem` is a simple problem with a few IPs to test your initial solution, good for the development of path planning, trajectory sampling, and collision avoidance
   2. `four_towers_small.problem` is a simple problem with a few IPs and extra obstacles, good for clustering, improving TSP sequences, parametrizing the solution, and testing
-  3. `four_towers_large.problem` is a complex problem with more than 30 IPs that will test your solution in full (**a similar problem will be used in the virtual competition** described below)
+  3. `four_towers_large.problem` is a complex problem with 30 IPs that will test your solution in full (**a similar problem will be used in the virtual competition** described below)
 
 ## Competition
 
