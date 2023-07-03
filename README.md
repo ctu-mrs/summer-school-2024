@@ -39,9 +39,9 @@ cd ${HOME}/git/summer-school-2023 && ./install.sh
 
 ## Task overview
 
-You are given two UAVs (Red 🟥 and Blue 🟦) required to inspect a set of **inspections points (IPs)** as fast as possible in a 3D environment with obstacles.
+You are given two UAVs (Red 🟥 and Blue 🟦) required to inspect a set of **inspection points (IPs)** as fast as possible in a 3D environment with obstacles.
 The two UAVs are equipped with the [MRS control pipeline](https://github.com/ctu-mrs/uav_core) [1], allowing precise trajectory tracking.
-Your task is to assign the IPs to the UAVs and to generate multi-goal paths visiting **viewpoints (VPs)** (poses in which the particular IPs are inspected with on-board cameras) of each IP while keeping a safe distance from the obstacles and between the two UAVs.
+Your task is to assign the IPs to the UAVs and to generate multi-goal paths visiting **viewpoints (VPs)** (poses in which the particular IPs are inspected with onboard cameras) of each IP while keeping a safe distance from the obstacles and between the two UAVs.
 Furthermore, you shall convert paths to collision-free time-parametrized trajectories that respect the UAVs' dynamic [constraints](#constraints).
 The IPs are defined by their position and inspection angle and are divided into three subsets:
 
@@ -53,10 +53,10 @@ The IPs are defined by their position and inspection angle and are divided into 
 
 To inspect an IP, you have to visit its attached VP with a correct UAV within a radius of 0.3 m and with a maximum deviation in inspection heading and pitch of 0.2 rad.
 **Each successfully inspected point increments your score by 1.**
-The overall objective is to maximize the score while minimizing the flight time of both the UAVs.
+The overall objective is to maximize the score while minimizing the flight time of both UAVs.
 
 The trajectories are required to begin and end at predefined starting locations.
-The mission starts when the trajectories following is started and ends once the UAVs stop at their starting locations.
+The mission starts when the trajectory following is started and ends once the UAVs stop at their starting locations.
 The motion blur effect during imaging is neglected; thus, the UAVs are not required to stop at particular VPs.
 
 ## Task assignment
@@ -64,7 +64,7 @@ The motion blur effect during imaging is neglected; thus, the UAVs are not requi
 There is a low-performance solution available at your hands.
 This solution consists of:
 * non-controlled heading of the UAVs,
-* random assignment of IPs in 🟣 to UAVs,
+* random assignment of common IPs 🟣 to each UAV,
 * computation of TSP (Traveling Salesman Problem) tours using Euclidean distance estimates,
 * planning paths with the use of badly parametrized RRT planner,
 * generation of trajectories with required zero velocity at the end of each straight segment,
@@ -82,17 +82,17 @@ Please go through the code and its inline comments to give you a better idea abo
   4. Try different parameters of path planners (e.g., grid resolution or sampling distance) and evaluate their impact on the quality of your solution.
   5. Increase performance of the chosen path planner (e.g., by path straightening or implementing informed RRT).
   6. Consider flight time instead of path length when searching for the optimal sequence of locations in TSP.
-  7. Apply path smoothing and continuous trajectory sampling (no stops at waypoints) to speed up the flight. In the code, we have prepared the `toppra` library for computing path parametrizations [2]. Check out the documentation and try to utilize it.
+  7. Apply path smoothing and continuous trajectory sampling (no stops at waypoints) to speed up the flight. In the code, we have prepared the `toppra` library for computing path parametrizations [2]. Check out the [documentation](https://hungpham2511.github.io/toppra/) and try to utilize it.
   8. Postprocess the time-parametrized trajectories to resolve collisions. Start by improving the implemented collision avoidance, e.g., by delaying trajectory start till there is no collision. Tip: try the methods available for you in the config file (see below).
   9. Effectively redistribute IPs to avoid collisions and to achieve lower inspection time.
 
   **Things to avoid:**
 
-* Too high minimum distance from obstacles could lead to path planners failing to find a path to some locations.
+* Very high minimum distance from obstacles could lead to path planners failing to find a path to some locations.
 * Smoothing and shortening the path in locations of inspections could lead to missing the inspection point.
 * Sampling on a grid with a small resolution could lead to errors emerging from discretization.
 
-Note that the task in its generality is very complex to be solved in a limited time during several days.
+Note that the overall task is very complex to be fully solved in a limited time during the summer school.
 You are not expected to solve every subproblem so do not feel bad if you don't.
 Instead, try to exploit and improve the parts of the solution you are most interested in or think to improve the solution the most.
 While designing your solution, do not forget to consider maximum computational time.
@@ -131,9 +131,9 @@ Change your code within directory `summer-school-2023/mrim_task/mrim_planner` (c
     * `tsp_solvers.py`: This is where VPs assignment for TSP, path planning, and solving TSP happens. Here you can play with an efficient assignment of VPs to UAVs or study the effect of path planners on TSP solution performance.
     * `utils.py`: Default source of various utility functions. Feel free to add your own.
   * `path_planners/grid_based`
-    * `astar.py`: Implementation of A* path planner. Here you can finished the planner using proper heuristic function and add path straightening functionality.
+    * `astar.py`: Implementation of A* path planner. Here you can finish the planner using proper heuristic function, and add path straightening functionality.
   * `path_planners/sampling_based`
-    * `rrt.py`: Implementation of RRT path planner. Here you can upgrade the planner to RRT*, implement a better sampling method and add path straightening functionality.
+    * `rrt.py`: Implementation of RRT path planner. Here you can upgrade the planner to RRT*, implement a better sampling method, and add path straightening functionality.
   * `config/`
     * `virtual.yaml` and `real_world.yaml`: Config files (for two challenges described below) containing various parameters/switches for the task. If you need other parameters, add them here, load them in `scripts/planner.py` and use them in the code accordingly.
 
