@@ -42,15 +42,17 @@ def signal_handler(sig, frame):
 # #{ class Evaluator
 
 class Evaluator:
-    def __init__(self, inspection_problem, viewpoints_distance, allowed_dist_deviation, allowed_heading_deviation, allowed_pitch_deviation, horizontal_aovs):
+    def __init__(self, inspection_problem, viewpoints_t_distance, viewpoints_s_distance, allowed_dist_deviation, allowed_heading_deviation, allowed_pitch_deviation, horizontal_aovs, vertical_aovs):
         # load problem
-        self.viewpoints_distance = viewpoints_distance
+        self.viewpoints_t_distance = viewpoints_t_distance
+        self.viewpoints_s_distance = viewpoints_s_distance
         self.inspection_problem = inspection_problem
         self.viewpoints = self.getInspectionViewpoints(inspection_problem)
         self.allowed_dist_dev = allowed_dist_deviation
         self.allowed_heading_dev = allowed_heading_deviation
         self.allowed_pitch_dev = allowed_pitch_deviation
         self.horizontal_aovs = horizontal_aovs
+        self.vertical_aovs = vertical_aovs
         self.start_poses = inspection_problem.start_poses
         self.zero_score = False
 
@@ -86,18 +88,64 @@ class Evaluator:
                         self.viewpoints[k].is_inspected = self.isPointInspected(self.viewpoints[k], self.inspection_problem.inspection_points[k], poses[r], r)
 
     def isPointInspected(self, viewpoint, inspection_point, pose, robot_index):
-        dev_xy = np.sqrt((inspection_point.position.x - pose.x)**2 + (inspection_point.position.y - pose.y)**2)
-        dist_dev = abs(np.sqrt(dev_xy**2 + (inspection_point.position.z - pose.z)**2) - self.viewpoints_distance)
-        heading = wrapAngle(math.atan2(inspection_point.position.y - pose.y, inspection_point.position.x - pose.x))
-        heading_dev = abs(wrapAngle(heading - viewpoint.heading))
-        is_in_hfov = abs(wrapAngle(pose.heading - heading)) < self.horizontal_aovs[robot_index]/2
-        pitch_dev = abs(math.atan2(inspection_point.position.z - pose.z, dev_xy))
-        return dist_dev <= self.allowed_dist_dev and heading_dev <= self.allowed_heading_dev and pitch_dev <= self.allowed_pitch_dev and is_in_hfov
+        if inspection_point.type == 't':
+            viewpoints_distance = self.viewpoints_t_distance
+            dev_xy = np.sqrt((inspection_point.position.x - pose.x)**2 + (inspection_point.position.y - pose.y)**2)
+            dist_dev = abs(np.sqrt(dev_xy**2 + (inspection_point.position.z - pose.z)**2) - viewpoints_distance)
+            heading = wrapAngle(math.atan2(inspection_point.position.y - pose.y, inspection_point.position.x - pose.x))
+            heading_dev = abs(wrapAngle(heading - viewpoint.heading))
+            is_in_hfov = abs(wrapAngle(pose.heading - heading)) < self.horizontal_aovs[robot_index]/2
+            pitch_dev = abs(math.atan2(inspection_point.position.z - pose.z, dev_xy))
+            return dist_dev <= self.allowed_dist_dev and heading_dev <= self.allowed_heading_dev and pitch_dev <= self.allowed_pitch_dev and is_in_hfov
+        elif inspection_point.type == 's':
+            viewpoints_distance = self.viewpoints_s_distance
+            dev_xy = np.sqrt((inspection_point.position.x - pose.x)**2 + (inspection_point.position.y - pose.y)**2)
+            dist_dev = abs(np.sqrt(dev_xy**2 + (inspection_point.position.z - pose.z)**2) - viewpoints_distance)
+            # SE3 Matrix = |Rotation, Translation|
+            #              |0,        1         |
+            Drone_to_World = np.array([
+                [math.cos(pose.heading), -math.sin(pose.heading), 0.0, pose.x],
+                [math.sin(pose.heading), math.cos(pose.heading), 0.0, pose.y],
+                [0.0, 0.0, 1.0, pose.z],
+                [0.0, 0.0, 0.0, 1.0]])
+            World_to_Drone = np.linalg.inv(Drone_to_World)
+            inspection_point_transformed = np.matmul(World_to_Drone, np.array([inspection_point.position.x,
+                                                                               inspection_point.position.y,
+                                                                               inspection_point.position.z,
+                                                                               1.0]))
+            theta_xz = math.atan2(inspection_point_transformed[2],
+                                  inspection_point_transformed[0])
+            # theta_xz should be greater than -((pi/2)+(vfov/2)) and less than -((pi/2)-(vfov/2))
+            # is_in_vfov = (theta_xz > -((math.pi/2)+(self.vertical_aovs[robot_index]/2)) and theta_xz < -((math.pi/2)-(self.vertical_aovs[robot_index]/2)))
+            is_in_vfov = abs(theta_xz-(-math.pi/2)
+                             ) <= self.vertical_aovs[robot_index]/2
+            theta_xy = math.atan2(inspection_point_transformed[2],
+                                  inspection_point_transformed[1])
+            # is_in_hfov = (theta_xy > -((math.pi/2)+(self.horizontal_aovs[robot_index]/2)) and theta_xy < -((math.pi/2)-(self.horizontal_aovs[robot_index]/2)))
+            is_in_hfov = abs(theta_xy-(-math.pi/2)
+                             ) <= self.horizontal_aovs[robot_index]/2
+            # theta_xy should be greater than -((pi/2)+(hfov/2)) and less than -((pi/2)-(hfov/2))
+            
+            heading_dev = abs(wrapAngle(pose.heading - viewpoint.heading))
+            return is_in_hfov and is_in_vfov and dist_dev <= self.allowed_dist_dev and heading_dev <= self.allowed_heading_dev
+        else:
+            raise Exception(
+                f"Type '{inspection_point.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
+
 
     def inspectionPointToViewPoint(self, inspection_point):
-        x       = inspection_point.position.x + self.viewpoints_distance * np.cos(inspection_point.inspect_heading)
-        y       = inspection_point.position.y + self.viewpoints_distance * np.sin(inspection_point.inspect_heading)
-        z       = inspection_point.position.z
+        if inspection_point.type == 't':
+            x       = inspection_point.position.x + self.viewpoints_t_distance * np.cos(inspection_point.inspect_heading)
+            y       = inspection_point.position.y + self.viewpoints_t_distance * np.sin(inspection_point.inspect_heading)
+            z       = inspection_point.position.z
+        elif inspection_point.type == 's':
+            x       = inspection_point.position.x
+            y       = inspection_point.position.y
+            z       = inspection_point.position.z + self.viewpoints_s_distance
+        else:
+            raise Exception(f"Type '{inspection_point.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
+
+
         heading = np.unwrap([inspection_point.inspect_heading + np.pi])[0]
         color_index = inspection_point.inspectability[0] if len(inspection_point.inspectability) == 1 else 0
 
@@ -167,7 +215,8 @@ class MrimManager:
         rviz_config = rospy.get_param('~rviz_config')
         self.print_info = rospy.get_param('~print_info')
         global_frame = rospy.get_param('~global_frame')
-        viewpoint_distance = rospy.get_param('~viewpoints/distance')
+        viewpoint_t_distance = rospy.get_param('~viewpoints/t_distance')
+        viewpoint_s_distance = rospy.get_param('~viewpoints/s_distance')
         allowed_dist_dev = rospy.get_param('~viewpoints/inspection_limits/distance')
         allowed_heading_dev = rospy.get_param('~viewpoints/inspection_limits/heading')
         allowed_pitch_dev = rospy.get_param('~viewpoints/inspection_limits/pitch')
@@ -271,7 +320,8 @@ class MrimManager:
 
         self.pcl_map = PclKDTree(self.inspection_problem.obstacle_points)
 
-        self.evaluator_ = Evaluator(self.inspection_problem, viewpoint_distance, allowed_dist_dev, allowed_heading_dev, allowed_pitch_dev, [horizontal_aov_1, horizontal_aov_2])
+        self.evaluator_ = Evaluator(self.inspection_problem, viewpoint_t_distance, viewpoint_s_distance,
+                                    allowed_dist_dev, allowed_heading_dev, allowed_pitch_dev, [horizontal_aov_1, horizontal_aov_2], [vertical_aov_1, vertical_aov_2])
 
         rospy.loginfo("[MrimManager] Starting trajectory checker.")
 
@@ -296,7 +346,7 @@ class MrimManager:
         traveled_dist_publishers = []
         for k in range(self.inspection_problem.number_of_robots):
             jsk_diagnostics_publishers.append(rospy.Publisher('/visualization/diagnostics_jsk_' + str(k+1), OverlayText, queue_size=1))
-            cones_publishers.append(rospy.Publisher('/visualization/cone_' + str(k+1) , Marker, queue_size=1))
+            cones_publishers.append(rospy.Publisher('/visualization/cone_' + str(k+1) , Marker, queue_size=2))
             path_publishers.append(rospy.Publisher('/visualization/path_' + str(k+1), Path, queue_size=1))
             odometry_publishers.append(rospy.Publisher('/visualization/odom_' + str(k+1), Odometry, queue_size=1))
             horizon_publishers.append(rospy.Publisher('/visualization/horizon_' + str(k+1), PoseArray, queue_size=1))
@@ -330,8 +380,15 @@ class MrimManager:
                                            uav_names[0], uav_names[1])
             self.rviz_proc = subprocess.Popen(['rviz', '-d', tmp_rviz_config], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             rospy.Rate(0.2).sleep()
+        
+            self.visualizer_.publishSafetyArea()
+            self.visualizer_.publishObstacles()
+            self.visualizer_.publishInspectionPoints(self.evaluator_.inspection_problem.inspection_points, self.evaluator_.viewpoints)
+            self.visualizer_.publishViewPoints(self.evaluator_.inspection_problem.inspection_points, self.evaluator_.viewpoints)
+            self.visualizer_.publishStartPositionsWithoutArrows()
 
         # #} end of INITIALIZATION OF RVIZ VISUALIZER
+        
 
         # #{ TRAJECTORIES SUBSCRIPTION OR LOADING
 
@@ -392,7 +449,7 @@ class MrimManager:
 
         dynamic_constraints_ok_list = self.checkDynamicConstraints(self.trajectories, self.constraints)
 
-        safety_area_ok_list = self.checkSafetyArea(self.trajectories, False, minimum_height, maximum_height)
+        safety_area_ok_list, safety_area_ok_list_in_time = self.checkSafetyArea(self.trajectories, False, minimum_height, maximum_height)
 
         overall_status = True
 
@@ -472,7 +529,7 @@ class MrimManager:
                 self.visualizer_.publishPaths(self.trajectories)
                 self.visualizer_.publishCollisions(self.trajectories, collisions_between_uavs)
                 self.runOfflineTrajectoryPlayback(self.trajectories, odometry_publishers, playback_speed, trajectory_dt, uav_obstacle_distances,\
-                                           mutual_distances, minimum_obstacle_distance, minimum_mutual_distance)
+                                           mutual_distances, minimum_obstacle_distance, minimum_mutual_distance, safety_area_ok_list_in_time)
                 self.evaluator_.resetScore()
                 rate.sleep()
 
@@ -695,6 +752,7 @@ class MrimManager:
 
     def checkSafetyArea(self, trajectories, safety_area, minimum_height, maximum_height):
         results = []
+        results_in_time = []
         ok_min, ok_max = True, True
         mins, maxs = [], []
 
@@ -704,6 +762,8 @@ class MrimManager:
             # rospy.loginfo("[MrimManager] ---------- Min and max height check for trajectory %s: ----------", trajectories[k].trajectory_name)
 
             z_list = [pose.z for pose in trajectories[k].poses]
+
+            results_in_time_k = (np.array(z_list) > minimum_height) * (np.array(z_list) < maximum_height)
 
             z_min = min(np.array(z_list))
             z_max = max(np.array(z_list))
@@ -730,6 +790,7 @@ class MrimManager:
                 result = False
 
             results.append(result)
+            results_in_time.append(results_in_time_k)
 
             if self.print_info:
                 rospy.loginfo("[MrimManager] Height limits of trajectory %s:", trajectories[k].trajectory_name)
@@ -738,9 +799,12 @@ class MrimManager:
         rospy.loginfo("[MrimManager] [{:s}] Min/max height:".format(boolToString(ok_min and ok_max)))
         for k in range(len(trajectories)):
             ok = results[k]
-            rospy.loginfo("[MrimManager]    - [{:s}] {:s}: min|max = {:.2f}|{:.2f} (limit: {:.2f}|{:.2f}) m".format(boolToString(ok), self.trajectories[k].trajectory_name, mins[k], maxs[k], minimum_height, maximum_height))
+            if ok:
+                rospy.loginfo("[MrimManager]    - [{:s}] {:s}: min|max = {:.2f}|{:.2f} (limit: {:.2f}|{:.2f}) m".format(boolToString(ok), self.trajectories[k].trajectory_name, mins[k], maxs[k], minimum_height, maximum_height))
+            else: 
+                rospy.loginfo("[MrimManager]    - [{:s}] {:s}: min|max = {:.10f}|{:.10f} (limit: {:.10f}|{:.10f}) m".format(boolToString(ok), self.trajectories[k].trajectory_name, mins[k], maxs[k], minimum_height, maximum_height))
 
-        return results
+        return results, results_in_time
 
     # #} end of checkSafetyArea()
 
@@ -810,7 +874,7 @@ class MrimManager:
 
         rospy.loginfo("[MrimManager] [{:s}] Minimum UAV-to-obstacle distance:".format(boolToString(ok)))
         for k in range(len(dists_list)):
-            rospy.loginfo("[MrimManager]    - [{:s}] {:s}: {:.2f} m".format(boolToString(ok), self.trajectories[k].trajectory_name, dists[k]))
+            rospy.loginfo("[MrimManager]    - [{:s}] {:s}: {:.2f} m".format(boolToString(result[k]), self.trajectories[k].trajectory_name, dists[k]))
 
         return result
 
@@ -903,7 +967,7 @@ class MrimManager:
 
     # #{ runOfflineTrajectoryPlayback()
 
-    def runOfflineTrajectoryPlayback(self, trajectories, odometry_publishers, playback_speed, dt, obstacle_dists, mutual_dists, min_obst_dist, min_mutual_dist):
+    def runOfflineTrajectoryPlayback(self, trajectories, odometry_publishers, playback_speed, dt, obstacle_dists, mutual_dists, min_obst_dist, min_mutual_dist, safety_area_check):
         rospy.loginfo_once("[MrimManager] Running trajectory playback.")
         playback_rate = rospy.Rate(playback_speed/dt)
         max_len = max(np.array([len(trajectory.poses) for trajectory in trajectories]))
@@ -920,7 +984,7 @@ class MrimManager:
         while trajectory_idx < max_len:
             if not self.playback_paused:
                 self.visualizer_.publishFullScreenMsg("")
-                self.publishPlaybackOffline(trajectories, trajectory_idx, obstacle_dists, mutual_dists, min_obst_dist, min_mutual_dist)
+                self.publishPlaybackOffline(trajectories, trajectory_idx, obstacle_dists, mutual_dists, min_obst_dist, min_mutual_dist, safety_area_check)
                 trajectory_idx += 1
 
             playback_rate.sleep()
@@ -999,7 +1063,7 @@ class MrimManager:
 
     # #{ publishPlaybackOffline()
 
-    def publishPlaybackOffline(self, trajectories, trajectory_idx, obstacle_dists, mutual_dists, min_obst_dist, min_mutual_dist):
+    def publishPlaybackOffline(self, trajectories, trajectory_idx, obstacle_dists, mutual_dists, min_obst_dist, min_mutual_dist, safety_area_check):
 
         poses = []
         for k in range(len(trajectories)):
@@ -1024,6 +1088,13 @@ class MrimManager:
                 self.evaluator_.setZeroScore()
                 with self.diag_msg_lock:
                     msg = "Minimum mutual distance violated!"
+                    if not msg in self.diag_msgs:
+                        self.diag_msgs.append(msg)
+            
+            if not safety_area_check[k][t_idx]:
+                self.evaluator_.setZeroScore()
+                with self.diag_msg_lock:
+                    msg = "Safety area violated!"
                     if not msg in self.diag_msgs:
                         self.diag_msgs.append(msg)
 
@@ -1065,7 +1136,7 @@ class MrimManager:
                     msg = "Minimum mutual distance violated!"
                     if not msg in self.diag_msgs:
                         self.diag_msgs.append(msg)
-
+            
         if not self.mission_time_exceeded and mission_time > self.mission_time_limit:
             with self.diag_msg_lock:
                 self.diag_msgs.append("-- Mission time limit exceeded! --")

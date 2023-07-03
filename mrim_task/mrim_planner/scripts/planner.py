@@ -23,16 +23,28 @@ class MrimPlanner:
 
         ## | ---------------------- load problem ---------------------- |
         problem_filename = rospy.get_param('~problem/name')
+        session_problem = rospy.get_param('~session_problem')
+        if(session_problem != 'offline'):
+            log_msg = "Session.yml problem name doesn't match the virtual.yaml name, check ReadMe."
+            if((problem_filename == 'four_towers_large.problem' or problem_filename == 'four_towers_small.problem') and session_problem != "four_towers"):
+                rospy.logerr(log_msg)
+                rospy.signal_shutdown(log_msg)
+                exit(-1)
+            elif(problem_filename == 'single_tower.problem' and session_problem != "single_tower"):
+                rospy.logerr(log_msg)
+                rospy.signal_shutdown(log_msg)
+                exit(-1)
         problem_filepath = rospkg.RosPack().get_path('mrim_resources') + "/problems/" + problem_filename
         problem, log_msg = ProblemLoader().loadProblem(problem_filepath)
 
         if problem is None:
             rospy.logerr(log_msg)
-            rospy.signal_shutdown(log_msg);
+            rospy.signal_shutdown(log_msg)
             exit(-1)
 
         ## |  load parameters from ROS custom config (mrim_task/mrim_planner/config/custom_config.yaml)  |
-        self._viewpoints_distance      = rospy.get_param('~viewpoints/distance', 3.0)
+        self._viewpoints_t_distance    = rospy.get_param('~viewpoints/t_distance', 3.0)
+        self._viewpoints_s_distance    = rospy.get_param('~viewpoints/s_distance', 3.0)
         self._plot                     = rospy.get_param('~problem/plot', False)
         self._trajectory_dt            = rospy.get_param('~trajectories/dt', 0.2)
         self._smoothing_sampling_step  = rospy.get_param('~path_smoothing/sampling_step', 0.1)
@@ -68,7 +80,7 @@ class MrimPlanner:
         de_method = self._path_planner['distance_estimation_method']
         if pp_method == 'astar' or de_method == 'astar':
             self._path_planner['astar/grid_resolution'] = rospy.get_param('~path_planner/astar/grid_resolution')
-        elif pp_method.startswith('rrt') or de_method.startswith('rrt'):
+        if pp_method.startswith('rrt') or de_method.startswith('rrt'):
             self._path_planner['rrt/branch_size']      = rospy.get_param('~path_planner/rrt/branch_size')
             self._path_planner['rrt/sampling/method']  = rospy.get_param('~path_planner/rrt/sampling/method')
             self._path_planner['rrtstar/neighborhood'] = None
@@ -150,7 +162,14 @@ class MrimPlanner:
             for ip in problem.inspection_points:
 
                 # convert IP to VP [id x y z heading]
-                viewpoint = inspectionPointToViewPoint(ip, self._viewpoints_distance)
+                if ip.type == 't':
+                    # inspection point on tower
+                    viewpoint = inspectionPointToViewPoint(ip, self._viewpoints_t_distance)
+                elif ip.type == 's':
+                    # inspection point on solar panel
+                    viewpoint = inspectionPointToViewPoint(ip, self._viewpoints_s_distance)
+                else:
+                    raise Exception(f"Type '{ip.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
 
                 # if inspectability of IP is unique for robot with this ID, add it
                 if len(ip.inspectability) == 1 and robot_id in ip.inspectability:
@@ -172,7 +191,8 @@ class MrimPlanner:
                 print('   [{:d}]:'.format(vp.idx), vp.pose)
 
         # add VPs to offline visualization
-        plotter.addViewPoints(viewpoints, self._viewpoints_distance)
+        plotter.addViewPoints(viewpoints, self._viewpoints_t_distance, self._viewpoints_s_distance)
+
         # # #}
 
         # Print out if the viewpoints collide with the environment

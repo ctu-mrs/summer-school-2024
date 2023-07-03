@@ -151,12 +151,20 @@ def inspectionPointToViewPoint(inspection_point, vp_distance):
     Returns:
         list[5]: the viewpoint in format [index, x, y, z, inspection angle (UAV heading)]
     '''
-    x       = inspection_point.position.x + vp_distance * np.cos(inspection_point.inspect_heading)
-    y       = inspection_point.position.y + vp_distance * np.sin(inspection_point.inspect_heading)
-    z       = inspection_point.position.z
+    if inspection_point.type == 't':
+        x       = inspection_point.position.x + vp_distance * np.cos(inspection_point.inspect_heading)
+        y       = inspection_point.position.y + vp_distance * np.sin(inspection_point.inspect_heading)
+        z       = inspection_point.position.z
+    elif inspection_point.type == 's':
+        x       = inspection_point.position.x
+        y       = inspection_point.position.y
+        z       = inspection_point.position.z + vp_distance
+    else:
+        raise Exception(f"Type '{inspection_point.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
+
     heading = wrapAngle(np.pi + inspection_point.inspect_heading)
 
-    return Viewpoint(inspection_point.idx, Pose(x, y, z, heading))
+    return Viewpoint(inspection_point.idx, Pose(x, y, z, heading), inspection_point.type)
 # # #}
 
 # # #{ pointCollidesWithPath()
@@ -400,10 +408,18 @@ class ProblemPlotter:
 
         for ip in ips:
 
-            self.ax.scatter([ip.position.x], [ip.position.y], [ip.position.z], '.', color=color, s=ms)
-            self.ax.plot([ip.position.x, ip.position.x + hl * np.cos(ip.inspect_heading)],
-                         [ip.position.y, ip.position.y + hl * np.sin(ip.inspect_heading)],
-                         [ip.position.z, ip.position.z], '-', color=color, lw=lw)
+            if ip.type == 't':
+                self.ax.scatter([ip.position.x], [ip.position.y], [ip.position.z], '.', color=color, s=ms)
+                self.ax.plot([ip.position.x, ip.position.x + hl * np.cos(ip.inspect_heading)],
+                             [ip.position.y, ip.position.y + hl * np.sin(ip.inspect_heading)],
+                             [ip.position.z, ip.position.z], '-', color=color, lw=lw)
+            elif ip.type == 's':
+                self.ax.scatter([ip.position.x], [ip.position.y], [ip.position.z], '.', color=color, s=ms)
+                self.ax.plot([ip.position.x, ip.position.x],
+                             [ip.position.y, ip.position.y],
+                             [ip.position.z, ip.position.z + hl], '-', color=color, lw=lw)
+            else:
+                raise Exception(f"Type '{vp.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
 
             if annotate:
                 self.ax.text(ip.position.x, ip.position.y, ip.position.z, ' id: ' + str(ip.idx), 'x', color='black')
@@ -421,7 +437,7 @@ class ProblemPlotter:
     # # #}
 
     # # #{ addViewPoints()
-    def addViewPoints(self, vps, vp_to_ip_dist, hl=0.5, ms=60, lw=2.5, annotate=False):
+    def addViewPoints(self, vps, t_vp_to_ip_dist, s_vp_to_ip_dist, hl=0.5, ms=60, lw=2.5, annotate=False):
         if not self.use:
             return
 
@@ -436,13 +452,26 @@ class ProblemPlotter:
                 heading = vp.pose.heading
 
                 self.ax.scatter([point.x], [point.y], [point.z], '.', color=COLORS[r], s=ms)
-                self.ax.plot([point.x, point.x + hl * np.cos(heading)],
-                             [point.y, point.y + hl * np.sin(heading)],
-                             [point.z, point.z], '-', color=COLORS[r], lw=lw)
 
-                self.ax.plot([point.x, point.x + vp_to_ip_dist * np.cos(heading)],
-                             [point.y, point.y + vp_to_ip_dist * np.sin(heading)],
-                             [point.z, point.z], '-', color=COLORS[r], lw=0.2)
+                if vp.type == 't':
+                    # inspection point on tower
+                    self.ax.plot([point.x, point.x + hl * np.cos(heading)],
+                                 [point.y, point.y + hl * np.sin(heading)],
+                                 [point.z, point.z], '-', color=COLORS[r], lw=lw)
+                    self.ax.plot([point.x, point.x + t_vp_to_ip_dist * np.cos(heading)],
+                                 [point.y, point.y + t_vp_to_ip_dist * np.sin(heading)],
+                                 [point.z, point.z], '-', color=COLORS[r], lw=0.2)
+                elif vp.type == 's':
+                    # inspection point on solar panel
+                    self.ax.plot([point.x, point.x],
+                                 [point.y, point.y],
+                                 [point.z, point.z - hl], '-', color=COLORS[r], lw=lw)
+                    self.ax.plot([point.x, point.x],
+                                 [point.y, point.y],
+                                 [point.z, point.z - s_vp_to_ip_dist], '-', color=COLORS[r], lw=0.2)
+                else:
+                    raise Exception(f"Type '{vp.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
+
 
                 if annotate:
                     self.ax.text(point.x, point.y, point.z, ' id: ' + str(vp.idx), 'x', color='black')
@@ -634,19 +663,26 @@ class ProblemLoader:
                         continue
                     if line.startswith("INSPECTION_POINTS_END"):
                         break
+                    if not line:
+                        continue 
 
                     params = line.split(" ")
                     params = [x for x in params if x != '']
                     if len(params) < 5:
                         return None, str("wrong problem specification (inspection point should contain at least idx x y z heading)")
-
+                    
                     inspection_point = InspectionPoint()
                     inspection_point.idx = int(params[0])
                     inspection_point.position.x = float(params[1])
                     inspection_point.position.y = float(params[2])
                     inspection_point.position.z = float(params[3])
                     inspection_point.inspect_heading = float(params[4])
-                    inspection_point.inspectability = [int(p) for p in params[5:]]
+                    inspection_point.type = str(params[5])
+                    inspection_point.inspectability = []
+                    for p in params[6:]:
+                        if p == '#':
+                            break
+                        inspection_point.inspectability.append(int(p))
 
                     problem.inspection_points.append(inspection_point)
 

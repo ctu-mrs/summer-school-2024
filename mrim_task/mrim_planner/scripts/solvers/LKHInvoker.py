@@ -30,7 +30,7 @@ class LKHInvoker:
 
 # Change these directories based on where you have
 # a compiled executable of the LKH TSP Solver
-    LKH_DIR = '/opt/LKH-2.0.9/'    # absolute path
+    LKH_DIR = '/opt/LKH-2.0.10/'    # absolute path
     TSPLIB_DIR = '/tmp/LKH_files/' # absolute path
     LKH_CMD = 'LKH'                # name of the program
     # PWD= os.path.dirname(os.path.abspath(__file__))

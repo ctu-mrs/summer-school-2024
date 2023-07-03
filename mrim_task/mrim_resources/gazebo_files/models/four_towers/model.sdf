@@ -6,7 +6,7 @@
       <collision name="collision">
         <geometry>
           <mesh>
-            <scale>0.1 0.1 0.1</scale>
+            <scale>1 1 1</scale>
             <uri>model://four_towers/meshes/four_towers.dae</uri>
           </mesh>
         </geometry>
@@ -14,15 +14,10 @@
       <visual name="visual">
         <geometry>
           <mesh>
-            <scale>0.1 0.1 0.1</scale>
+            <scale>1 1 1</scale>
             <uri>model://four_towers/meshes/four_towers.dae</uri>
           </mesh>
         </geometry>
-        <material>
-          <script>
-            <name>Gazebo/Grey</name>
-          </script>
-        </material>
       </visual>
     </link>
   </model>

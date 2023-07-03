@@ -65,6 +65,9 @@ fi
 # check for the Computer Department image
 if [ -e /opt/mrs/mrs_uav_system_ss.sif ]; then
   CONTAINER_PATH=/opt/mrs/mrs_uav_system_ss.sif
+# check for room E-23
+elif [ -e /opt/singularity/mrs_uav_system ]; then
+  CONTAINER_PATH=/opt/singularity/mrs_uav_system
 # check for the Cybernetics Department image
 elif [ -e /opt/singularity/robolab/mrs_uav_system_ss ]; then
   CONTAINER_PATH=/opt/singularity/robolab/mrs_uav_system_ss

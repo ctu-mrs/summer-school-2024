@@ -149,11 +149,11 @@
     </plugin>
     <!--}-->
 
-      <!-- power tower libomysl {-->
+      <!-- four towers model {-->
       
       <include>
         <uri>model://four_towers</uri>
-        <pose> 0 0 0 -1.57079633 0 0 </pose>
+        <pose> 0 0 0 0 0 0 </pose>
         <name>four_towers</name>
       </include>
       

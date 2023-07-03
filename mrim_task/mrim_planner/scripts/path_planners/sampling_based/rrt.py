@@ -296,6 +296,7 @@ class RRT:
         raise NotImplementedError('[STUDENTS TODO] RRT: path straightening is not finished. Finish it on your own.')
         # Tips:
         #  - divide the given path by a certain ratio and use this method recursively
+        #  - validateLinePath() returns true if there are no obstacles between two points and vice-versa
 
         if not self.validateLinePath(pt1, pt2, check_bounds=False):
             
