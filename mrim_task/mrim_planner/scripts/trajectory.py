@@ -198,7 +198,7 @@ class TrajectoryUtils():
                 subtraj_0 = subtraj[i - 1].point
                 subtraj_1 = subtraj[i].point
 
-                # [STUDENTS TODO, COMPULSORY] Implement heading interpolation here
+                # [STUDENTS TODO] Implement heading interpolation here
                 # Tips:
                 #  - subtrajectory is a section of trajectory and consists of poses to follow during this segment
                 #  - interpolate the heading linearly (create a function of distance between two points of the subpath)
