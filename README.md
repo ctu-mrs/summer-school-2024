@@ -24,7 +24,7 @@ No further changes are made to the host operating system.
 Requirements: Linux OS, approx. 6.5 GB of HDD space.\
 For a non-Ubuntu OS, please, install the Singularity on your own.
 
-1. If you are a `git` veteran, you would think about `fork`-ing the repository, but because you are a veteran, you will know that a fork of a public repository cannot be made private and you don't want your team's solutions to be public. So, we recommend to tap the plus sign in the top right corner, and then select the Import repository option. Add `https://github.com/ctu-mrs/summer-school-2023.git` as the link and while completing this form/page, you will find an option to make your new repository private.  
+1. If you are a `git` veteran, you would think about `fork`-ing the repository, but because you are a veteran, you will know that a fork of a public repository cannot be made private, and you don't want your team's solutions to be public. So, we recommend to tap the plus sign in the top right corner, and then select the Import repository option. Add `https://github.com/ctu-mrs/summer-school-2023.git` as the link and while completing this form/page, you will find an option to make your new repository private.  
 
 2. Clone your new repository to `~/git`:
 ```bash
@@ -249,7 +249,7 @@ Please, **email us** the code to `guptapar@fel.cvut.cz` with the subject **SUMME
 ```bash
 zip -r my_team_name.zip mrim_planner
 ```
-The submitted archive has to contain the whole package `mrim_planner`, including two config files (`real_world.yaml` and `virtual.yaml`) in the folder `mrim_planner/config`. **Please don't forget to copy the parameters from `virtual.yaml` to `real_world.yaml`.**
+The submitted archive has to contain the whole package `mrim_planner`, including two config files (`real_world.yaml` and `virtual.yaml`) in the folder `mrim_planner/config`. **Please don't forget to modify the parameters in `real_world.yaml` according to your findings/configuration in virtual worlds.**
 Please include the names of all team members in the email message.
 **The late submissions will not be accepted for the competition**.
 
