@@ -131,11 +131,13 @@ class Viewpoint:
 
         pose     = Pose(x, y, z, heading)
         vp       = Viewpoint(0, pose)
+        vp_type  = Viewpoint type: 's' for solar panel viewpoint, 't' for tower viewpoint 
     '''
 
-    def __init__(self, idx, pose):
+    def __init__(self, idx, pose, vp_type=None):
         self.idx  = idx
         self.pose = pose
+        self.type = vp_type
 
     def __eq__(self, other):
         if isinstance(other, Viewpoint):

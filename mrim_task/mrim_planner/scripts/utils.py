@@ -164,7 +164,7 @@ def inspectionPointToViewPoint(inspection_point, vp_distance):
 
     heading = wrapAngle(np.pi + inspection_point.inspect_heading)
 
-    return Viewpoint(inspection_point.idx, Pose(x, y, z, heading))
+    return Viewpoint(inspection_point.idx, Pose(x, y, z, heading), inspection_point.type)
 # # #}
 
 # # #{ pointCollidesWithPath()
@@ -408,10 +408,18 @@ class ProblemPlotter:
 
         for ip in ips:
 
-            self.ax.scatter([ip.position.x], [ip.position.y], [ip.position.z], '.', color=color, s=ms)
-            self.ax.plot([ip.position.x, ip.position.x + hl * np.cos(ip.inspect_heading)],
-                         [ip.position.y, ip.position.y + hl * np.sin(ip.inspect_heading)],
-                         [ip.position.z, ip.position.z], '-', color=color, lw=lw)
+            if ip.type == 't':
+                self.ax.scatter([ip.position.x], [ip.position.y], [ip.position.z], '.', color=color, s=ms)
+                self.ax.plot([ip.position.x, ip.position.x + hl * np.cos(ip.inspect_heading)],
+                             [ip.position.y, ip.position.y + hl * np.sin(ip.inspect_heading)],
+                             [ip.position.z, ip.position.z], '-', color=color, lw=lw)
+            elif ip.type == 's':
+                self.ax.scatter([ip.position.x], [ip.position.y], [ip.position.z], '.', color=color, s=ms)
+                self.ax.plot([ip.position.x, ip.position.x],
+                             [ip.position.y, ip.position.y],
+                             [ip.position.z, ip.position.z + hl], '-', color=color, lw=lw)
+            else:
+                raise Exception(f"Type '{vp.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
 
             if annotate:
                 self.ax.text(ip.position.x, ip.position.y, ip.position.z, ' id: ' + str(ip.idx), 'x', color='black')
@@ -457,10 +465,10 @@ class ProblemPlotter:
                     # inspection point on solar panel
                     self.ax.plot([point.x, point.x],
                                  [point.y, point.y],
-                                 [point.z, point.z + hl], '-', color=COLORS[r], lw=lw)
+                                 [point.z, point.z - hl], '-', color=COLORS[r], lw=lw)
                     self.ax.plot([point.x, point.x],
                                  [point.y, point.y],
-                                 [point.z, point.z + s_vp_to_ip_dist], '-', color=COLORS[r], lw=0.2)
+                                 [point.z, point.z - s_vp_to_ip_dist], '-', color=COLORS[r], lw=0.2)
                 else:
                     raise Exception(f"Type '{vp.type}' of inspection point is not valid! Valid types are: 's' for solar panel and 't' for tower.")
 
