@@ -36,6 +36,13 @@ export ROS_WORKSPACES="$ROS_WORKSPACES /opt/mrs/mrs_workspace ~/summer-school-20
 # source uav_core from within the container
 source /opt/mrs/mrs_workspace/src/uav_core/miscellaneous/shell_additions/shell_additions.sh
 
+# if host pc is not Ubuntu 20.04
+OS_INFO=$(cat /proc/version)
+if ! ([[ "$OS_INFO" == *"Ubuntu"* ]] && [[ "$OS_INFO" == *"20.04"* ]]); then
+  export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+  source /usr/share/gazebo/setup.bash
+fi
+
 # source the linux setup from within
 if [ -e /opt/klaxalk/git/linux-setup/appconfig/zsh/dotzshrc ]; then
 
