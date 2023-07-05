@@ -18,7 +18,7 @@ from sklearn.neighbors import KDTree
 import sensor_msgs
 import sensor_msgs.point_cloud2
 from std_msgs.msg import ColorRGBA, Float32, Empty, Bool
-from std_srvs.srv import Trigger, SetBool
+from std_srvs.srv import Trigger, SetBool, SetBoolResponse
 from nav_msgs.msg import Path, Odometry
 from geometry_msgs.msg import PoseStamped, PoseArray, Pose, Point, Quaternion, Vector3, TransformStamped
 from mrs_msgs.msg import TrajectoryReference, UavState
@@ -1199,17 +1199,23 @@ class MrimManager:
     # #{ startMonitoringCallback()
 
     def startMonitoringCallback(self, req):
+        resp = SetBoolResponse()
+        resp.success = True
         if req.data:
             if not self.mission_started:
                 self.task_monitor.start()
 
             self.mission_started = True
+            resp.message = "mission started"
+            return resp
 
         else:
             if not self.mission_finished:
                 self.task_monitor.stop()
 
             self.mission_finished = True
+            resp.message = "mission finished"
+            return resp
 
     # #} end of startMonitoringCallback()
 
