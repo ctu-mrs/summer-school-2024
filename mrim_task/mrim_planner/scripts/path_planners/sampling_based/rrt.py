@@ -123,10 +123,10 @@ class RRT:
     # # #}
 
     # # #{ getRandomPointGaussian()
-    def getRandomPointGaussian(self, sigma_offset=0.0):
+    def getRandomPointGaussian(self, point, sigma_offset=0.0):
         
         # Compute mean and standard deviation
-        st, en = [self.start[i] for i in range(3)], [self.end[i] for i in range(3)]
+        st, en = [point[i] for i in range(3)], [self.end[i] for i in range(3)]
         mean   = np.mean([st, en], axis=0)
         sigma  = np.std([st, en], axis=0)
 
@@ -249,9 +249,11 @@ class RRT:
         start_time                   = time.time()
         rrt_gaussian_sigma_inflation = 0.0
 
+        new_start = self.start 
+
         while not self.tree.valid:
 
-            point         = self.getRandomPoint() if not self.gaussian_sampling else self.getRandomPointGaussian(rrt_gaussian_sigma_inflation)
+            point         = self.getRandomPoint() if not self.gaussian_sampling else self.getRandomPointGaussian(new_start, rrt_gaussian_sigma_inflation)
             closest_point = self.getClosestPoint(point)
            
             # normalize vector closest_point->point to length of branch_size
@@ -266,6 +268,7 @@ class RRT:
                     parent, cost = self.getParentWithOptimalCost(point, closest_point, rrtstar_neighborhood)
 
                 self.tree.add_node(point, parent, cost)
+                new_start = point 
 
                 if rrtstar:
                     # RRT*: Rewire all neighbors
