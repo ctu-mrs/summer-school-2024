@@ -1,0 +1,25 @@
+NAME: testing problem (two robots)
+COMMENT: Testing MRIM problem for MRS UAV Summer School 2024
+
+# ID X Y Z HEADING
+ROBOTS_START
+1 11.0 -8.0 1.6 1.57
+2  0.0 -8.0 1.6 1.57
+ROBOTS_END
+
+# ID X Y Z HEADING TILT TYPE INSPECTABILITY
+INSPECTION_POINTS_START
+1 1.6 1 5.2 -0.8 1.57 t 1
+2 -0.3 -2.9 3.5 -1.5 1.57 t 1 2
+3 6.63 1.0 2.50 -1.57 1.57 t 1 2
+# 4 -0.7 -0.2 5.30 2.5 1.1 t 1 2
+# 5 6.45 -2.68 3.36 -1.6 1.57 t 1
+# 6 11.36 -1.50 3.46 1.5 1.57 t 2
+# 7 11.30 -4.4 0.94 1.5 0 s 2
+INSPECTION_POINTS_END
+
+OBSTACLE_POINTS: single_chimney.asc
+WORLD: single_chimney.yaml
+MODEL: single_chimney.stl
+
+EOF

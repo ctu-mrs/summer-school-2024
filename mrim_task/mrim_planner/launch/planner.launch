@@ -1,0 +1,37 @@
+<launch>
+
+  <arg name="RUN_TYPE" default="offline"/>
+  <arg name="RVIZ_GUI" default="true" />
+  <arg name="SESSION_PROBLEM" default="" />
+
+  <!-- DO NOT CHANGE BELOW -->
+
+  <node name="mrim_planner" pkg="mrim_planner" type="planner.py" output="screen" args="">
+
+    <!-- Default config -->
+    <rosparam file="$(find mrim_manager)/config/default_$(arg RUN_TYPE).yaml" command="load" />
+
+    <!-- User custom config -->
+    <rosparam unless="$(eval arg('RUN_TYPE') == 'realworld')"
+              file="$(find mrim_planner)/config/virtual.yaml" command="load" />
+    <rosparam if="$(eval arg('RUN_TYPE') == 'realworld')"
+              file="$(find mrim_planner)/config/real_world.yaml" command="load" />
+    <param name="session_problem" value="$(arg SESSION_PROBLEM)" />
+
+    <!-- Remap publishers -->
+    <remap from="~problem_out"      to="~problem" />
+    <remap from="~trajectory_1_out" to="~trajectory_1" />
+    <remap from="~trajectory_2_out" to="~trajectory_2" />
+
+  </node>
+
+  <include file="$(find mrim_manager)/launch/manager.launch" >
+
+    <arg name="RUN_TYPE" value="$(arg RUN_TYPE)" />
+    <arg name="RVIZ_GUI" value="$(arg RVIZ_GUI)" />
+
+  </include>
+
+  <!-- INCLUDE ANY OTHER NODES BELOW -->
+
+</launch>

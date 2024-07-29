@@ -1,0 +1,31 @@
+<launch>
+
+  <arg name="RUN_TYPE" />
+
+  <!-- other args -->
+  <arg name="standalone" default="true" />
+  <arg name="debug" default="false" />
+
+  <arg     if="$(eval arg('standalone') or arg('debug'))" name="nodelet" value="standalone" />
+  <arg unless="$(eval arg('standalone') or arg('debug'))" name="nodelet" value="load" />
+  <arg     if="$(eval arg('standalone') or arg('debug'))" name="nodelet_manager" value="" />
+  <arg unless="$(eval arg('standalone') or arg('debug'))" name="nodelet_manager" value="tf_connector_nodelet_manager" />
+
+  <arg     if="$(arg debug)" name="launch_prefix" value="debug_roslaunch" />
+  <arg unless="$(arg debug)" name="launch_prefix" value="" />
+
+  <node pkg="nodelet" type="nodelet" name="tf_connector" args="$(arg nodelet) mrs_tf_connector/TFConnector $(arg nodelet_manager)" output="screen" launch-prefix="$(arg launch_prefix)">
+
+    <!-- UAV names for UAV -->
+    <rosparam if="$(eval arg('RUN_TYPE') == 'realworld')"     file="$(find mrim_state_machine)/config/tf_connector_realworld.yaml" />
+    <rosparam unless="$(eval arg('RUN_TYPE') == 'realworld')" file="$(find mrim_state_machine)/config/tf_connector_simulation.yaml" />
+
+      <!-- Subscribers -->
+    <remap from="~tf_in" to="/tf" />
+
+      <!-- Publishers -->
+    <remap from="~tf_out" to="/tf" />
+
+  </node>
+
+</launch>

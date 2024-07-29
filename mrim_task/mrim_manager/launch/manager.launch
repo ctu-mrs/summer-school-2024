@@ -1,0 +1,73 @@
+<launch>
+
+  <arg name="RUN_TYPE" default="offline" />
+  <arg name="RVIZ_GUI" default="true" />
+  
+  <!-- UAV names for virtual -->
+  <arg unless="$(eval arg('RUN_TYPE') == 'realworld')" name="UAV_NAME_1" value="uav1" />
+  <arg unless="$(eval arg('RUN_TYPE') == 'realworld')" name="UAV_NAME_2" value="uav2" />
+  <!-- UAV names for UAV -->
+  <arg if="$(eval arg('RUN_TYPE') == 'realworld')" name="UAV_PAIR_ID" value="$(env SS_UAV_PAIR_ID)" />
+  <arg if="$(eval arg('RUN_TYPE') == 'realworld')" name="UAV_NAME_1" value="$(env SS_UAV_NAME_1)" />
+  <arg if="$(eval arg('RUN_TYPE') == 'realworld')" name="UAV_NAME_2" value="$(env SS_UAV_NAME_2)" />
+  
+  <!-- Configs -->
+  <arg name="config"             default="" />
+  <arg name="config/constraints" default="" />
+
+  <node name="mrim_manager" pkg="mrim_manager" type="manager.py" output="screen">
+
+    <!-- Load default configs -->
+    <rosparam file="$(find mrs_uav_managers)/config/public/constraint_manager/constraints.yaml" />
+    <rosparam file="$(find mrim_manager)/config/default_$(arg RUN_TYPE).yaml" />
+
+    <!-- User custom config for mrim_planner -->
+    <rosparam unless="$(eval arg('RUN_TYPE') == 'realworld')"
+              file="$(find mrim_planner)/config/virtual.yaml" command="load" />
+
+    <rosparam if="$(eval arg('RUN_TYPE') == 'realworld')"
+              file="$(find mrim_planner)/config/real_world.yaml" command="load" />
+    <rosparam if="$(eval arg('RUN_TYPE') == 'realworld')"
+              file="$(find mrim_manager)/config/uav_names/pair_$(arg UAV_PAIR_ID).yaml" command="load" />
+
+    <!-- Load custom configs -->
+    <rosparam if="$(eval not arg('config') == '')"             file="$(arg config)" />
+    <rosparam if="$(eval not arg('config/constraints') == '')" file="$(arg config/constraints)" />
+
+    <!-- Parameters -->
+    <param name="rviz_config" value="$(find mrim_manager)/config/rviz/$(arg RUN_TYPE).rviz" />
+    <param name="run_type" value="$(arg RUN_TYPE)" />
+    <param unless="$(arg RVIZ_GUI)" name="visualization/rviz/use" value="0" />
+
+    # Remap service servers
+    <remap from="start_monitoring_in" to="~start_monitoring" />
+
+    # Remap subscribers
+    <remap from="trajectory_1_in"       to="/mrim_planner/trajectory_1" />
+    <remap from="trajectory_2_in"       to="/mrim_planner/trajectory_2" />
+    <remap from="uav_state_1_in"        to="/$(arg UAV_NAME_1)/estimation_manager/uav_state" />
+    <remap from="uav_state_2_in"        to="/$(arg UAV_NAME_2)/estimation_manager/uav_state" />
+    <remap from="inspection_problem_in" to="/mrim_planner/problem" />
+    <remap from="pause_playback_in"     to="/pause_or_replay_playback" />
+
+    # Remap publishers
+    <remap from="inspection_points_out" to="/visualization/inspection_points" />
+    <remap from="view_points_out" to="/visualization/view_points" />
+    <remap from="collisions_out" to="/visualization/collisions" />
+    <remap from="cloud_out" to="/visualization/obstacles" />
+    <remap from="safety_area_out" to="/visualization/safety_area" />
+    <remap from="starting_points_out" to="/visualization/start_points" />
+    <remap from="start_arrows_out" to="/visualization/start_arrows" />
+    <remap from="score_out" to="/score" />
+    <remap from="mission_time_out" to="/elapsed_time" />
+    <remap from="remaining_mission_time_out" to="/mission_time" />
+    <remap from="playback_status_out" to="/visualization/playback_status" />
+    <remap from="diagnostics_out" to="/visualization/diagnostics" />
+    <remap from="fullscreen_msg_out" to="/visualization/fullscreen_msg" />
+    <remap from="solution_time_out" to="/visualization/remaining_solution_time" />
+    <remap from="solution_penalty_out" to="/visualization/solution_penalty" />
+    <remap from="trajectories_valid_status_out" to="~trajectories_valid" />
+
+  </node>
+
+</launch>

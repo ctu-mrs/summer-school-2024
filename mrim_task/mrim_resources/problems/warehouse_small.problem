@@ -1,0 +1,30 @@
+NAME: Warehouse with small number of inspection points (two robots)
+COMMENT: Warehouse problem for MRS UAV Summer School 2024
+
+# ID X Y Z HEADING
+ROBOTS_START
+1 7.5 17.5 1.0 -1.57
+2 -7.5 17.5 1.0 -1.57
+ROBOTS_END
+
+# ID X Y Z HEADING TYPE INSPECTABILITY
+INSPECTION_POINTS_START
+
+1 5.0 12.5 1.2 -0.78 0.78 t 1 2
+2 5.0 4.0 1.2 -0.78 0.78 t 1 2
+3 5.0 -4.8 1.2 -0.78 0.78 t 1 2
+4 -5.0 12.5 1.2 2.35 0.78 t 1 2
+5 -5.0 4.0 1.2 2.35 0.78 t 1 2
+6 -5.0 -4.8 1.2 2.35 0.78 t 1 2
+7 8.15 -21.47 1.0 2.35 0.78 t 1 2
+8 8.6 -17.6 1.1 2.35 0.78 t 1 2
+9 0.0 9.3 1.5 1.57 0.78 t 1
+10 0.3 1.8 1.5 -0.2 0.78 t 2
+
+INSPECTION_POINTS_END
+
+OBSTACLE_POINTS: warehouse.asc
+WORLD: warehouse.yaml
+MODEL: warehouse.stl
+
+EOF

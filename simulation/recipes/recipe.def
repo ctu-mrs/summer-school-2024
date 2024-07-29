@@ -1,0 +1,95 @@
+Bootstrap: docker # uncomment for bootstrapping from dockerhub
+# Bootstrap: docker-daemon # uncomment for bootstrapping from local docker daemon
+
+# From: ubuntu:20.04 # uncomment for bootstrapping from generic Ubuntu image
+# From: ros:noetic # uncomment for bootstrapping from ROS Noetic image
+From: klaxalk/linux-setup:master # uncomment for bootstrapping from Tomas's linux-setup
+
+%post
+
+    # fix prompts during installation
+    apt-get -y update
+    apt-get -y install sudo
+    echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections
+    sudo apt-get install -y -q
+    DEBIAN_FRONTEND=noninteractive sudo apt-get -y install keyboard-configuration
+
+    # we need curl to add the PPAs later
+    sudo apt-get -y install curl git
+
+    # install ROS
+    curl https://ctu-mrs.github.io/ppa-stable/add_ros_ppa.sh | bash
+    apt-get -y install ros-noetic-desktop-full
+
+    # install the MRS UAV System
+    curl https://ctu-mrs.github.io/ppa-stable/add_ppa.sh | bash
+    apt-get -y install ros-noetic-mrs-uav-system-full
+
+    # install visual studio code
+    # takeon from https://code.visualstudio.com/docs/setup/linux
+    cd /tmp
+    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+    install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
+    sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
+    rm -f packages.microsoft.gpg
+
+    sudo apt-get -y install apt-transport-https
+    sudo apt-get -y update
+    sudo apt-get -y install code # or code-insiders
+
+    # install sublimetext
+    # taken from https://www.sublimetext.com/docs/linux_repositories.html
+    wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
+    sudo apt-get -y install apt-transport-https
+    echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+    sudo apt-get -y update
+    sudo apt-get -y install sublime-text
+
+    # install pycharm
+    wget https://download.jetbrains.com/python/pycharm-community-2023.1.2.tar.gz
+    tar -xvzf pycharm-community-2023.1.2.tar.gz -C /opt/
+
+    # install summer school dependencies
+    sudo apt-get -y install python3-matplotlib python3-sklearn ros-noetic-jsk-rviz-plugins
+    sudo -H pip3 install matplotlib scikit-spatial==7.0.0 scikit-learn dubins
+    sudo -H pip3 install git+https://github.com/hungpham2511/toppra
+
+    # install other potentially useful libraries
+    sudo -H pip3 install klampt tsp openpathsampling kmeans dart numpy==1.19.5
+    sudo -H pip3 install scipy==1.10.1 pandas moveit pcl robotics
+
+    # location for the apptainer files
+    export MRS_LOCATION=/opt/mrs
+    mkdir -p $MRS_LOCATION
+
+    # link configuration file for the MRS Apptainer
+    ln -s $MRS_LOCATION/host/99-mrs_env.sh /.singularity.d/env/99-mrs_env.sh
+
+    # link configuration file for the linux-setup environment
+    ln -s $MRS_LOCATION/host/99-linux_setup_env.sh /.singularity.d/env/99-linux_setup_env.sh
+
+    VERSION=2.0.10
+    ARCHIVE=LKH-$VERSION.tgz
+    DIR=LKH-$VERSION
+
+    cd /opt/
+    wget http://www.akira.ruc.dk/~keld/research/LKH/$ARCHIVE
+    tar -xvf $ARCHIVE
+    rm $ARCHIVE
+
+    cd $DIR
+    make
+
+%environment
+    export LC_ALL=C
+
+%runscript
+  CMD="${@}"
+
+  if [ -z "${CMD}" ]; then
+    /bin/bash --login
+  else
+    /bin/bash --login -c "${CMD}"
+  fi
+
+  exit 0

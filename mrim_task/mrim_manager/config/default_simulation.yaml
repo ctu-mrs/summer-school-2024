@@ -1,0 +1,73 @@
+print_info: False
+
+# Frames
+global_frame: "fixed_origin"
+uav_names: ["uav1", "uav2"]
+
+# Dynamic constraints of the UAVs
+dynamic_constraints:
+  controller: "fast" # controller constraints
+  tolerance: 0.01 # acceptable violation of constraints
+  max_velocity:             
+    x: 5.0 # (m/s)
+    y: 5.0 # (m/s)
+    z: 2.0 # (m/s)
+  max_acceleration:             
+    x: 5.0 # (m/s2)
+    y: 5.0 # (m/s2)
+    z: 2.0 # (m/s2)
+  max_heading_rate: 1.0 # (rad/s)
+  max_heading_rate_acceleration: 2.0 # (rad/s^2)
+
+# Trajectory parameters
+trajectories:
+  dt: 0.2 # (s)
+
+  # For planning
+  min_distance:
+    mutual:    2.5 # (m)
+    obstacles: 1.9 # (m)
+
+  # For evaluation
+  check:
+    mutual: 2.5 # (m)
+    obstacles: 1.5 # (m)
+
+  subscribe: True
+
+  # If you want to load trajectories from files, set parameter subscribe above to False and 
+  # specify folder and names of trajectory files
+  loading:
+    folder: "path_to_folder_where_trajectories_are_stored"
+    files:  ["trajectory_uav1.csv", "trajectory_uav2.csv"]
+
+# Viewpoints specifications
+viewpoints:
+  distance: 4.0 # (m)
+
+  inspection_limits:
+    distance: 0.3 # (m)
+    heading:  0.2 # (rad)
+    pitch:    0.2 # (rad)
+
+# Mission parameters
+mission:
+  timeout: 200.0 # (s)
+
+solution_time_constraint:
+  hard: 200.0
+  soft: 80.0
+
+# Cameras
+cameras:
+  red:
+    angle_of_view:
+      horizontal: 1.0 # (rad)
+      vertical:   0.7 # (rad)
+    fov_length:   2.0 # (m)
+
+  blue:
+    angle_of_view:
+      horizontal: 1.0 # (rad)
+      vertical:   0.5 # (rad)
+    fov_length:   3.0 # (m)

@@ -1,0 +1,55 @@
+# do not modify these
+root: ./
+name: simulation
+socket_name: mrs
+attach: false
+tmux_options: -f /etc/ctu-mrs/tmux.conf
+# you can modify these
+pre_window: export PROBLEM=warehouse; export UAV_NAME=uav1; export RUN_TYPE=simulation; export UAV_TYPE=x500; export WORLD_FILE='$(find mrim_resources)'/worlds/${PROBLEM}.yaml; export BOND=false; export CUSTOM_CONFIG=./config/custom_config.yaml; export WORLD_CONFIG=./config/world_config.yaml; export NETWORK_CONFIG=./config/network_config.yaml; export PLATFORM_CONFIG=`rospack find mrs_multirotor_simulator`/config/mrs_uav_system/$UAV_TYPE.yaml
+startup_window: planner
+windows:
+  - roscore:
+      layout: tiled
+      panes:
+        - roscore
+  - simulator:
+      layout: tiled
+      panes:
+        - waitForRos; roslaunch mrs_multirotor_simulator multirotor_simulator.launch custom_config:=./config/simulator_${PROBLEM}.yaml
+  - hw_api:
+      layout: tiled
+      panes:
+        - waitForTime; export UAV_NAME=uav1; roslaunch mrs_multirotor_simulator hw_api.launch custom_config:=./config/hw_api.yaml nodelet_manager_name:=$UAV_NAME\_nodelet_manager
+        - waitForTime; export UAV_NAME=uav2; roslaunch mrs_multirotor_simulator hw_api.launch custom_config:=./config/hw_api.yaml nodelet_manager_name:=$UAV_NAME\_nodelet_manager
+  - control:
+      layout: tiled
+      panes:
+        - export UAV_NAME=uav1; waitForTime; roslaunch mrs_uav_core core.launch
+        - export UAV_NAME=uav2; waitForTime; roslaunch mrs_uav_core core.launch
+  - automatic_start:
+      layout: tiled
+      panes:
+        - export UAV_NAME=uav1; waitForTime; roslaunch mrs_uav_autostart automatic_start.launch custom_config:=./config/automatic_start.yaml
+        - export UAV_NAME=uav2; waitForTime; roslaunch mrs_uav_autostart automatic_start.launch custom_config:=./config/automatic_start.yaml
+  - state_machine:
+      layout: even-vertical
+      panes:
+        - waitForHw; roslaunch mrim_state_machine simulation.launch
+  - planner:
+      layout: even-vertical
+      panes:
+        - waitForControl; roslaunch mrim_planner planner.launch RUN_TYPE:=simulation SESSION_PROBLEM:=$PROBLEM
+  - start_planning:
+      layout: even-vertical
+      synchronize: after
+      panes:
+        - 'history -s rosservice call /$UAV_NAME/mrim_state_machine/start'
+  - takeoff:
+      layout: tiled
+      panes:
+        - export UAV_NAME=uav1; waitForControl; rosservice call /$UAV_NAME/hw_api/arming 1; sleep 2; rosservice call /$UAV_NAME/hw_api/offboard; exit
+        - export UAV_NAME=uav2; waitForControl; rosservice call /$UAV_NAME/hw_api/arming 1; sleep 2; rosservice call /$UAV_NAME/hw_api/offboard; exit
+  - tf_connector:
+      layout: tiled
+      panes:
+        - waitForHw; roslaunch mrim_state_machine tf_connector.launch RUN_TYPE:=simulation

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package format="2">
+
+  <name>mrim_resources</name>
+  <version>1.0.0</version>
+  <description>Multi-Robot Inspection and Monitoring resources</description>
+
+  <author email="pavel.petracek@fel.cvut.cz">Pavel Petracek</author>
+  <maintainer email="vit.kratky@fel.cvut.cz">Vit Kratky</maintainer>
+
+  <license>BSD-3</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>gazebo</depend>
+  <depend>gazebo_ros</depend>
+  <depend>cmake_modules</depend>
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>mrs_msgs</depend>
+  <depend>message_runtime</depend>
+  <depend>message_generation</depend>
+
+  <export>
+    <gazebo_ros gazebo_model_path="${prefix}/gazebo_files/models"/>
+  </export>
+
+</package>

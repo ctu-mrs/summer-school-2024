@@ -1,0 +1,115 @@
+mrs_uav_managers:
+
+  estimation_manager:
+
+    # loaded state estimator plugins
+    state_estimators: [
+      "gps_baro",
+    ]
+
+    initial_state_estimator: "gps_baro" # will be used as the first state estimator
+    agl_height_estimator: "" # only slightly filtered height for checking min height (not used in control feedback)
+
+  uav_manager:
+
+    min_height_checking:
+      enabled: false
+
+    max_height_checking:
+      enabled: false
+
+    takeoff:
+
+      after_takeoff:
+        controller: "Se3Controller"
+
+  constraint_manager:
+
+    # list of allowed constraints per odometry mode
+    allowed_constraints:
+      gps_garmin: ["mrim"]
+      gps_baro: ["mrim"]
+      rtk: ["mrim"]
+      rtk_garmin: ["mrim"]
+
+    estimator_types: [
+      "gps_garmin",
+      "gps_baro",
+      "rtk",
+      "rtk_garmin",
+    ]
+
+    constraints: [
+      "slow",
+      "medium",
+      "fast",
+      "mrim",
+    ]
+    
+    default_constraints:
+      gps_garmin: "mrim"
+      gps_baro: "mrim"
+      rtk: "mrim"
+      rtk_garmin: "mrim"
+
+    mrim:
+
+      horizontal:
+        speed: 5.0
+        acceleration: 5.0
+        jerk: 60.0
+        snap: 60.0
+
+      vertical:
+
+        ascending:
+          speed: 4.0
+          acceleration: 2.0
+          jerk: 60.0
+          snap: 60.0
+
+        descending:
+          speed: 4.0
+          acceleration: 2.0
+          jerk: 60.0
+          snap: 60.0
+
+      heading:
+        speed: 1.0
+        acceleration: 2.0
+        jerk: 40.0
+        snap: 40.0
+
+      angular_speed:
+        roll: 60.0
+        pitch: 60.0
+        yaw: 20.0
+
+      tilt: 60 # [deg]
+
+
+  control_manager:
+
+    Se3Controller:
+      eland_threshold: 4.0 # [m], position error triggering eland
+      failsafe_threshold: 6.0 # [m], position error triggering failsafe land
+      odometry_innovation_threshold: 1.5 # [m], position odometry innovation threshold
+
+mrs_uav_trackers:
+  
+  mpc_tracker:
+
+    wiggle:
+      enabled: false
+      amplitude: 0.5 # [m]
+      frequency: 0.2 # [Hz]
+
+    # mrs collision avoidance
+    collision_avoidance:
+
+      enabled:           false # disabling this will stop this UAV to react to others, but it will still transmit data to others
+      enabled_passively: false # disabling this will stop this uav to even transmit its data to others (only if enabled: false)
+      radius: 5.0 # [m]
+      correction: 3.0 # [m]
+
+

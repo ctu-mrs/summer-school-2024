@@ -1,0 +1,60 @@
+#
+## DEFINITION OF THE ARENA
+#
+
+utm_origin_units: 1 # 0 - UTM, 1 - Latitude Longitude
+# !!! BEWARE !!!: the lat&lon and UTM coordinates below might be wrong
+# !!! do NOT just switch utm_origin_units from 0<->1, the other form
+# !!! might not be updated or even set correctly in the first place.
+utm_origin_x: 465710.758973
+utm_origin_y: 5249465.43086
+utm_origin_lat: 47.397743
+utm_origin_lon: 8.545594
+
+init_gps_origin_local: false # origin of gps_origin will be in the position of UAV at odometry launch
+init_gps_offset_x: 0.0 # initial position of UAV relative to gps_origin when init_gps_origin_local is enabled
+init_gps_offset_y: 0.0 # initial position of UAV relative to gps_origin when init_gps_origin_local is enabled
+
+world_origin:
+  units: "LATLON" # {"UTM", "LATLON"}
+
+  origin_x: 47.397743
+  origin_y: 8.545594
+
+safety_area:
+
+  enabled: true
+
+  horizontal:
+
+    frame_name: "world_origin"
+
+    # convex polygon
+    #
+    # x, y [m] for any frame_name except latlon_origin
+    # x = latitude, y = longitude [deg]  for frame_name=="latlon_origin"
+    # points: [
+    #   10, 20,
+    #   10, -25,
+    #   -30, -25,
+    #   -30, 20
+    # ]
+    points: [
+      -29, -43.5,
+      42, -25,
+      30, 36,
+      13, 33,
+       -8, 60,
+      -52, 30,
+      -49, 14.5,
+      -57.5, 6,
+    ]
+
+  vertical:
+
+    # the frame of reference in which the max&min z is expressed
+    frame_name: "world_origin"
+    
+    max_z: 9.5
+    min_z: 0.3
+

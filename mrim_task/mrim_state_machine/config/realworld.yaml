@@ -1,0 +1,8 @@
+main_timer_rate: 100.0 # [Hz]
+rviz_timer_rate: 10.0 # [Hz]
+distance_timer_rate: 100.0 # [Hz]
+
+service_call_repeat: 10 # []
+
+# land after finishing the trajectory
+land: false

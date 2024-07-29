@@ -1,0 +1,77 @@
+<launch>
+
+  <arg name="uav_name" default="$(optenv UAV_NAME uav)"/>
+  <arg name="standalone" default="false" />
+
+  <arg name="world_file" default="$(find mrim_state_machine)/config/world.yaml" />
+
+  <arg unless="$(arg standalone)" name="nodelet" value="load"/>
+  <arg     if="$(arg standalone)" name="nodelet" value="standalone"/>
+  <arg unless="$(arg standalone)" name="nodelet_manager" value="mrim_nodelet_manager"/>
+  <arg     if="$(arg standalone)" name="nodelet_manager" value=""/>
+
+  <arg name="debug" default="false" />
+  <arg unless="$(arg debug)" name="launch_prefix" value=""/>
+  <arg     if="$(arg debug)" name="launch_prefix" value="debug_roslaunch"/>
+
+  <arg name="uav1" default="uav1" />
+  <arg name="uav2" default="uav2" />
+
+  <group ns="$(arg uav_name)">
+
+    <!-- Nodelet manager -->
+    <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen" launch-prefix="$(arg launch_prefix)">
+      <param name="num_worker_threads" value="8" />
+    </node>
+
+    <node name="mrim_state_machine" pkg="nodelet" type="nodelet" args="$(arg nodelet) mrim_state_machine/MrimStateMachine $(arg nodelet_manager)" output="screen">
+
+      <rosparam file="$(find mrim_state_machine)/config/simulation.yaml" />
+      <rosparam file="$(arg world_file)" />
+
+      <param name="master_uav_name" value="$(arg uav1)" />
+
+      <!-- Subscribers -->
+      <remap from="~mpc_diagnostics_1_in" to="/$(arg uav1)/control_manager/mpc_tracker/diagnostics" />
+      <remap from="~mpc_diagnostics_2_in" to="/$(arg uav2)/control_manager/mpc_tracker/diagnostics" />
+
+      <remap from="~control_manager_diagnostics_1_in" to="/$(arg uav1)/control_manager/diagnostics" />
+      <remap from="~control_manager_diagnostics_2_in" to="/$(arg uav2)/control_manager/diagnostics" />
+
+      <remap from="~trajectory_1_in" to="/mrim_planner/trajectory_1" />
+      <remap from="~trajectory_2_in" to="/mrim_planner/trajectory_2" />
+
+      <remap from="~odometry_1_in" to="/$(arg uav1)/estimation_manager/odom_main" />
+      <remap from="~odometry_2_in" to="/$(arg uav2)/estimation_manager/odom_main" />
+
+      <remap from="~trajectories_valid_in" to="/mrim_manager/trajectories_valid" />
+
+      <!-- Service clients -->
+      <remap from="~validate_start_position_1_out" to="/$(arg uav1)/control_manager/validate_reference_2d" />
+      <remap from="~validate_start_position_2_out" to="/$(arg uav2)/control_manager/validate_reference_2d" />
+
+      <remap from="~takeoff_1_out" to="/mrim_state_machine/ready_to_takeoff_1" />
+      <remap from="~takeoff_2_out" to="/mrim_state_machine/ready_to_takeoff_2" />
+
+      <remap from="~land_1_out" to="/$(arg uav1)/uav_manager/land" />
+      <remap from="~land_2_out" to="/$(arg uav2)/uav_manager/land" />
+
+      <remap from="~fly_to_start_1_out" to="/$(arg uav1)/control_manager/goto_trajectory_start" />
+      <remap from="~fly_to_start_2_out" to="/$(arg uav2)/control_manager/goto_trajectory_start" />
+
+      <remap from="~start_following_1_out" to="/$(arg uav1)/control_manager/start_trajectory_tracking" />
+      <remap from="~start_following_2_out" to="/$(arg uav2)/control_manager/start_trajectory_tracking" />
+
+      <remap from="~load_trajectory_1_out" to="/$(arg uav1)/control_manager/trajectory_reference" />
+      <remap from="~load_trajectory_2_out" to="/$(arg uav2)/control_manager/trajectory_reference" />
+
+      <remap from="~start_out" to="/mrim_manager/start_monitoring" />
+
+      <!-- Service servers -->
+      <remap from="~start_in" to="~start" />
+
+    </node>
+
+  </group>
+
+</launch>
