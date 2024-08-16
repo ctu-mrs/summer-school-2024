@@ -1,0 +1,50 @@
+#
+## DEFINITION OF THE ARENA
+#
+
+world_origin:
+  units: "UTM" # {"UTM", "LATLON"}
+
+  origin_x: 458422.2
+  origin_y: 5551241.4
+
+safety_area:
+
+  enabled: true
+
+  horizontal:
+
+    # the frame of reference in which the points are expressed
+    frame_name: "world_origin"
+
+    # polygon
+    #
+    # x, y [m] for any frame_name except latlon_origin
+    # x = latitude, y = longitude [deg]  for frame_name=="latlon_origin"
+    points: [
+      -29, -43.5,
+      42, -25,
+      30, 36,
+      13, 33,
+      # -8, 41,
+       -8, 60,
+      -52, 30,
+      -49, 14.5,
+      -57.5, 6,
+      # 50.111744, 14.419090,
+      # 50.112293, 14.418908,
+      # 50.112260, 14.418672,
+      # 50.112334, 14.418374,
+      # 50.112227, 14.417764,
+      # 50.112092, 14.417812,
+      # 50.112012, 14.417690,
+    ]
+
+  vertical:
+
+    # the frame of reference in which the max&min z is expressed
+    frame_name: "world_origin"
+
+    min_z: 0.5
+    max_z: 20.0
+

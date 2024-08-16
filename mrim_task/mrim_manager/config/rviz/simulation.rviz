@@ -78,7 +78,7 @@ Visualization Manager:
           Color: 0; 0; 0
           Color Transformer: FlatColor
           Decay Time: 0
-          Enabled: false
+          Enabled: true
           Invert Rainbow: false
           Max Color: 255; 255; 255
           Min Color: 0; 0; 0
@@ -93,7 +93,7 @@ Visualization Manager:
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
-          Value: false
+          Value: true
         - Class: rviz/Marker
           Enabled: true
           Marker Topic: /visualization/inspection_points
@@ -140,7 +140,7 @@ Visualization Manager:
           Marker Topic: /mesh_out
           Name: Mesh
           Namespaces:
-            "": true
+            {}
           Queue Size: 100
           Value: true
       Enabled: true
@@ -644,7 +644,7 @@ Visualization Manager:
           left: 500
           linewidth: 1
           max color: 37; 203; 0
-          max value: 10
+          max value: 31
           min value: 0
           show caption: true
           text size: 12
@@ -767,7 +767,7 @@ Visualization Manager:
           Marker Topic: /visualization/collisions
           Name: Collisions
           Namespaces:
-            lines: true
+            {}
           Queue Size: 100
           Value: true
       Enabled: true
@@ -801,7 +801,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 39.93397903442383
+      Distance: 75.96986389160156
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -817,9 +817,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.0347968339920044
+      Pitch: 0.7797970771789551
       Target Frame: <Fixed Frame>
-      Yaw: 2.4387221336364746
+      Yaw: 4.9387335777282715
     Saved: ~
 Window Geometry:
   Displays:

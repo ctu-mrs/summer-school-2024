@@ -78,7 +78,7 @@ Visualization Manager:
           Color: 0; 0; 0
           Color Transformer: FlatColor
           Decay Time: 0
-          Enabled: false
+          Enabled: true
           Invert Rainbow: false
           Max Color: 255; 255; 255
           Min Color: 0; 0; 0
@@ -93,7 +93,7 @@ Visualization Manager:
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
-          Value: false
+          Value: true
         - Class: rviz/Marker
           Enabled: true
           Marker Topic: /visualization/inspection_points
@@ -132,7 +132,7 @@ Visualization Manager:
           Marker Topic: /visualization/start_arrows
           Name: Start direction
           Namespaces:
-            arrow_ns: true
+            {}
           Queue Size: 100
           Value: true
         - Class: rviz/Marker
@@ -140,7 +140,7 @@ Visualization Manager:
           Marker Topic: /mesh_out
           Name: Mesh
           Namespaces:
-            "": true
+            {}
           Queue Size: 100
           Value: true
       Enabled: true
@@ -232,7 +232,7 @@ Visualization Manager:
           Marker Topic: /visualization/cone_1
           Name: Camera
           Namespaces:
-            cone_ns2: true
+            {}
           Queue Size: 100
           Value: true
         - Alpha: 1
@@ -437,7 +437,7 @@ Visualization Manager:
           Marker Topic: /visualization/cone_2
           Name: Camera
           Namespaces:
-            cone_ns1: true
+            {}
           Queue Size: 100
           Value: true
         - Alpha: 1
@@ -644,7 +644,7 @@ Visualization Manager:
           left: 500
           linewidth: 1
           max color: 37; 203; 0
-          max value: 10
+          max value: 31
           min value: 0
           show caption: true
           text size: 12
@@ -767,7 +767,7 @@ Visualization Manager:
           Marker Topic: /visualization/collisions
           Name: Collisions
           Namespaces:
-            lines: true
+            {}
           Queue Size: 100
           Value: true
       Enabled: true
@@ -801,7 +801,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 51.201446533203125
+      Distance: 74.13338470458984
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -809,17 +809,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -8.852982521057129
-        Y: -6.916556358337402
-        Z: 10.083260536193848
+        X: -5.833277225494385
+        Y: -4.023525714874268
+        Z: 13.19591999053955
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.0647976398468018
+      Pitch: 0.7347979545593262
       Target Frame: <Fixed Frame>
-      Yaw: 2.458690881729126
+      Yaw: 4.73870325088501
     Saved: ~
 Window Geometry:
   Displays:

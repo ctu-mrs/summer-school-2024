@@ -1,5 +1,5 @@
 problem:
-  name: "warehouse_small.problem" # [warehouse_small.problem, warehouse_large.problem, warehouse_yard.problem]
+  name: "realworld.problem" # [warehouse_small.problem, warehouse_large.problem, warehouse_yard.problem]
   plot: False
 
 # Parameters for Traveling Salesman Problem
